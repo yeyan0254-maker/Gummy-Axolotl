@@ -1,0 +1,4569 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>软糖六角恐龙 · Q弹果冻小宠 V5.0</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍬</text></svg>">
+<style>
+  :root{
+    --ink: #241e26;
+    --ink-soft: #6d6472;
+    --ink-faint: #a39aa9;
+    --pink: #f288ab;
+    --pink-deep: #e8618d;
+    --gold: #cfa96e;
+    --glass-bg: rgba(255, 253, 250, 0.84);
+    --glass-border: rgba(36, 30, 38, 0.08);
+    --serif: "Songti SC", "Noto Serif SC", "Source Han Serif SC", "STSong", "SimSun", Georgia, serif;
+    --sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Segoe UI", sans-serif;
+  }
+
+  *{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+  html, body{
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  body{
+    background: #f1e8dd;
+    color: var(--ink);
+    font-family: var(--sans);
+    cursor: none;
+    -webkit-font-smoothing: antialiased;
+    user-select: none;
+  }
+  @media (hover: none){
+    body{ cursor: auto; }
+    #cursor-ring, #cursor-dot{ display: none !important; }
+  }
+
+  #stage{
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    display: block;
+    touch-action: none;
+  }
+
+  /* Left Title Block (V3 保留) */
+  #title-block{
+    position: fixed;
+    top: 28px;
+    left: 36px;
+    z-index: 10;
+    pointer-events: none;
+    user-select: none;
+    max-width: 440px;
+  }
+  .kicker{
+    font-family: var(--sans);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.24em;
+    color: var(--ink-faint);
+    margin-bottom: 9px;
+  }
+  h1.title{
+    font-family: var(--serif);
+    font-style: normal;
+    font-weight: 600;
+    font-size: clamp(32px, 3.9vw, 54px);
+    line-height: 1.08;
+    letter-spacing: 0.02em;
+    color: var(--ink);
+  }
+  h1.title .slash{
+    color: var(--pink-deep);
+    font-weight: 400;
+    padding: 0 0.08em;
+  }
+  .subtitle{
+    margin-top: 10px;
+    font-family: var(--serif);
+    font-style: normal;
+    font-size: clamp(13px, 1.05vw, 15px);
+    color: var(--ink-soft);
+    max-width: 390px;
+    line-height: 1.68;
+  }
+  .hint{
+    margin-top: 12px;
+    font-family: var(--sans);
+    font-size: 11.5px;
+    letter-spacing: 0.05em;
+    color: var(--ink-faint);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hint::before{
+    content: "";
+    display: inline-block;
+    width: 14px;
+    height: 1px;
+    background: var(--ink-faint);
+  }
+
+  /* Bottom-Left Zoom & View Capsule (V3 保留) */
+  #zoom-bar{
+    position: fixed;
+    left: 34px;
+    bottom: 24px;
+    z-index: 25;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 7px;
+    border-radius: 999px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 8px 24px rgba(36, 30, 38, 0.075);
+    cursor: auto;
+  }
+  .z-btn{
+    height: 28px;
+    min-width: 28px;
+    padding: 0 8px;
+    border-radius: 999px;
+    border: none;
+    background: transparent;
+    color: var(--ink-soft);
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.16s ease, color 0.16s ease, transform 0.12s ease;
+  }
+  .z-btn:hover{
+    background: rgba(36, 30, 38, 0.06);
+    color: var(--ink);
+  }
+  .z-btn:active{
+    transform: scale(0.93);
+  }
+  .z-btn.reset-view{
+    font-size: 11.5px;
+    font-weight: 500;
+    padding: 0 10px;
+    border-left: 1px solid rgba(36, 30, 38, 0.09);
+    border-radius: 0 999px 999px 0;
+    margin-left: 2px;
+  }
+  #zoom-pct{
+    min-width: 44px;
+    text-align: center;
+    font-size: 11.5px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+    user-select: none;
+  }
+
+  /* Floating Toggle Button (when panel collapsed) */
+  #pane-toggle{
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 30;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 15px;
+    border-radius: 999px;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 8px 24px rgba(36, 30, 38, 0.09);
+    font-family: var(--sans);
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--ink);
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.25s ease, box-shadow 0.2s ease;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-6px);
+  }
+  #pane-toggle.visible{
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+  #pane-toggle:hover{
+    box-shadow: 0 12px 28px rgba(36, 30, 38, 0.13);
+    transform: translateY(-1px);
+  }
+
+  /* Right Control Panel (V3 保留) */
+  #pane{
+    position: fixed;
+    top: 18px;
+    right: 20px;
+    bottom: 18px;
+    z-index: 20;
+    width: 304px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 2px 6px 12px 2px;
+    scrollbar-width: thin;
+    scrollbar-color: #f0dde5 transparent;
+    cursor: auto;
+    transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
+  }
+  #pane.collapsed{
+    transform: translateX(calc(100% + 36px));
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .panel-head{
+    padding: 5px 8px 10px 10px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    user-select: none;
+  }
+  .panel-head h2{
+    font-family: var(--serif);
+    font-style: normal;
+    font-weight: 600;
+    font-size: 20px;
+    letter-spacing: 0.04em;
+    color: var(--ink);
+  }
+  .panel-head .cap{
+    font-family: var(--sans);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--ink-faint);
+    margin-top: 3px;
+  }
+  .head-actions{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 2px;
+  }
+  .mini-btn{
+    height: 28px;
+    padding: 0 9px;
+    border-radius: 999px;
+    border: 1px solid var(--glass-border);
+    background: rgba(255, 255, 255, 0.88);
+    color: var(--ink-soft);
+    font-family: var(--sans);
+    font-size: 11.5px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    transition: all 0.18s ease;
+    white-space: nowrap;
+  }
+  .mini-btn:hover{
+    background: #fff;
+    color: var(--ink);
+    box-shadow: 0 4px 10px rgba(36, 30, 38, 0.08);
+  }
+  .mini-btn.icon-only{
+    width: 28px;
+    padding: 0;
+    font-size: 13px;
+  }
+
+  /* Flavor Cards (V3 保留 + 音乐琴键发光脉冲 .singing) */
+  .card{
+    background: var(--glass-bg);
+    border: 1.5px solid var(--glass-border);
+    border-radius: 14px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 6px 18px rgba(36, 30, 38, 0.042);
+    padding: 7.5px 11px;
+    margin: 0 2px 6.5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.16s ease, box-shadow 0.22s ease, border-color 0.22s ease, background 0.22s ease;
+  }
+  .card:hover{
+    transform: translateY(-1.5px);
+    box-shadow: 0 10px 22px rgba(36, 30, 38, 0.08);
+    border-color: rgba(232, 97, 141, 0.30);
+  }
+  .card:active{
+    transform: scale(0.985);
+  }
+  .card.singing{
+    border-color: var(--fc, #f288ab);
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--fc, #f288ab) 25%, transparent),
+                0 8px 20px color-mix(in srgb, var(--fc, #f288ab) 28%, transparent);
+    transform: scale(1.015);
+  }
+  .swatch{
+    width: 29px;
+    height: 29px;
+    border-radius: 50%;
+    flex: 0 0 29px;
+    box-shadow:
+      inset 0 -4px 8px rgba(255, 255, 255, 0.5),
+      inset 0 3px 6px rgba(255, 255, 255, 0.85),
+      inset 0 -6px 12px rgba(0, 0, 0, 0.12),
+      0 3px 8px rgba(0, 0, 0, 0.09);
+  }
+  .card .name{
+    font-family: var(--serif);
+    font-style: normal;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1.2;
+    color: var(--ink);
+  }
+  .card .note{
+    font-family: var(--sans);
+    font-size: 10.5px;
+    letter-spacing: 0.02em;
+    color: var(--ink-soft);
+    margin-top: 2px;
+  }
+  .card .tag{
+    font-size: 10px;
+    color: var(--ink-faint);
+    margin-left: auto;
+    padding: 2px 7px;
+    border-radius: 99px;
+    background: rgba(36, 30, 38, 0.045);
+    white-space: nowrap;
+  }
+
+  /* Control Box (V3 保留) */
+  .ctrl{
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 6px 18px rgba(36, 30, 38, 0.042);
+    padding: 10px 13px;
+    margin: 0 2px 7.5px;
+  }
+  .row-label{
+    font-family: var(--sans);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 4px;
+  }
+  .row-label b{
+    color: var(--pink-deep);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    font-size: 11.5px;
+  }
+
+  input[type=range]{
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 19px;
+    background: transparent;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-runnable-track{
+    height: 5px;
+    border-radius: 99px;
+    background: linear-gradient(90deg, #ffd3e1, #efa6c0);
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    margin-top: -5.5px;
+    background: #fff;
+    border: 2px solid var(--pink-deep);
+    box-shadow: 0 3px 8px rgba(232, 97, 141, 0.35);
+    transition: transform 0.14s ease;
+  }
+  input[type=range]::-webkit-slider-thumb:hover{
+    transform: scale(1.12);
+  }
+  input[type=range]::-moz-range-track{
+    height: 5px;
+    border-radius: 99px;
+    background: #efa6c0;
+  }
+  input[type=range]::-moz-range-thumb{
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid var(--pink-deep);
+    box-shadow: 0 3px 8px rgba(232, 97, 141, 0.35);
+  }
+
+  .readouts{
+    display: flex;
+    gap: 8px;
+    margin-top: 3px;
+  }
+  .readout{
+    flex: 1;
+    background: rgba(255, 255, 255, 0.86);
+    border: 1px solid rgba(36, 30, 38, 0.06);
+    border-radius: 11px;
+    padding: 6px 6px;
+    text-align: center;
+  }
+  .readout .num{
+    font-family: var(--serif);
+    font-style: normal;
+    font-weight: 600;
+    font-size: 19px;
+    line-height: 1.05;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .readout .num small{
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    margin-left: 1px;
+  }
+  .readout .lab{
+    font-family: var(--sans);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: var(--ink-faint);
+    margin-top: 2px;
+  }
+
+  /* Magic Candy Feed Section (V3 保留) */
+  .feed-box{
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 6px 18px rgba(36, 30, 38, 0.042);
+    padding: 8.5px;
+    margin: 0 2px 7.5px;
+  }
+  .feed-main-btn{
+    width: 100%;
+    border: 1px solid rgba(232, 97, 141, 0.24);
+    background: linear-gradient(135deg, rgba(255, 246, 234, 0.96), rgba(255, 236, 245, 0.96));
+    color: #9b3055;
+    border-radius: 12px;
+    padding: 8.5px 10px;
+    font-family: var(--sans);
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    transition: transform 0.14s ease, box-shadow 0.15s ease, background 0.15s ease;
+  }
+  .feed-main-btn:hover{
+    background: linear-gradient(135deg, #fff6e8, #ffe9f3);
+    box-shadow: 0 6px 14px rgba(232, 97, 141, 0.14);
+    transform: translateY(-1px);
+  }
+  .feed-main-btn:active{
+    transform: scale(0.97);
+  }
+  .candy-pills{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+    margin-top: 6.5px;
+  }
+  .candy-pill{
+    border: 1px solid rgba(36, 30, 38, 0.07);
+    background: rgba(255, 255, 255, 0.72);
+    color: var(--ink-soft);
+    border-radius: 9px;
+    padding: 5px 2px;
+    font-family: var(--sans);
+    font-size: 10.5px;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+  }
+  .candy-pill:hover{
+    background: #fff;
+    color: var(--ink);
+  }
+  .candy-pill.active{
+    background: #fff0f5;
+    border-color: rgba(232, 97, 141, 0.55);
+    color: #b52e5c;
+    font-weight: 600;
+    box-shadow: 0 2px 7px rgba(232, 97, 141, 0.14);
+  }
+
+  /* 紧凑毛玻璃「五声音乐盒」控制条（融合 V3 风格） */
+  .music-bar{
+    background: var(--glass-bg);
+    border: 1.5px solid var(--glass-border);
+    border-radius: 16px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 6px 18px rgba(36, 30, 38, 0.042);
+    padding: 7px 9px;
+    margin: 0 2px 7.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: box-shadow 0.25s ease, border-color 0.25s ease;
+  }
+  .music-bar.playing{
+    border-color: rgba(232, 168, 92, 0.68);
+    box-shadow: 0 0 0 2px rgba(232, 168, 92, 0.16), 0 8px 20px rgba(232, 97, 141, 0.12);
+  }
+  .music-btn{
+    width: 31px;
+    height: 31px;
+    border-radius: 10px;
+    border: 1px solid rgba(36, 30, 38, 0.07);
+    background: rgba(255, 255, 255, 0.88);
+    color: var(--ink);
+    font-size: 13.5px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.18s ease;
+  }
+  .music-btn:hover{
+    background: #fff;
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(36, 30, 38, 0.08);
+  }
+  .music-btn:active{
+    transform: scale(0.95);
+  }
+  .music-btn.play-active{
+    background: linear-gradient(135deg, #ff99ba, #f4be6a);
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 4px 14px rgba(238, 95, 140, 0.36);
+    animation: musicGlow 2.2s ease-in-out infinite;
+  }
+  @keyframes musicGlow{
+    0%, 100% { box-shadow: 0 4px 12px rgba(238, 95, 140, 0.34); }
+    50% { box-shadow: 0 4px 18px rgba(244, 190, 106, 0.62); }
+  }
+  .music-center{
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4.5px;
+  }
+  .music-title-row{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+  }
+  .music-title{
+    font-family: var(--serif);
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .music-tag{
+    font-size: 9.5px;
+    color: var(--ink-faint);
+    white-space: nowrap;
+  }
+  .music-leds{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .music-led{
+    flex: 1;
+    max-width: 16px;
+    height: 5px;
+    border-radius: 999px;
+    background: rgba(36, 30, 38, 0.10);
+    transition: transform 0.12s ease, background 0.15s ease, box-shadow 0.15s ease;
+  }
+  .music-led.lit{
+    background: var(--lc, #f288ab);
+    transform: scaleY(1.38) scaleX(1.12);
+    box-shadow: 0 0 8px var(--lc, #f288ab);
+  }
+
+  /* 2x2 Interactive Mode Grid (V3 保留) */
+  .tool-row{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6.5px;
+    margin: 0 2px 7.5px;
+  }
+  .tool-btn{
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: var(--ink);
+    border-radius: 13px;
+    padding: 8.5px 8px;
+    font-family: var(--sans);
+    font-size: 11.8px;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    box-shadow: 0 5px 14px rgba(36, 30, 38, 0.04);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+  .tool-btn:hover{
+    background: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(36, 30, 38, 0.08);
+  }
+  .tool-btn:active{
+    transform: scale(0.96);
+  }
+  .tool-btn.active{
+    background: linear-gradient(135deg, #fff1f6, #fff6e8);
+    border-color: rgba(232, 97, 141, 0.58);
+    color: #b02e5a;
+    font-weight: 600;
+    box-shadow: 0 6px 16px rgba(232, 97, 141, 0.18);
+  }
+  .tool-btn.active.firefly-on{
+    background: linear-gradient(135deg, #fff9e5, #ffefd6);
+    border-color: rgba(214, 152, 48, 0.65);
+    color: #995c08;
+    box-shadow: 0 6px 16px rgba(214, 152, 48, 0.22);
+  }
+  .tool-btn.active.zero-g-on{
+    background: linear-gradient(135deg, #edf7ff, #f3efff);
+    border-color: rgba(114, 142, 232, 0.62);
+    color: #3650a8;
+    box-shadow: 0 6px 16px rgba(114, 142, 232, 0.20);
+  }
+
+  .count-chip{
+    font-family: var(--sans);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+    display: flex;
+    justify-content: space-between;
+    padding: 1px 6px 6.5px;
+  }
+
+  button#dump{
+    width: calc(100% - 4px);
+    margin: 0 2px;
+    border: none;
+    border-radius: 999px;
+    padding: 11px 16px 12px;
+    font-family: var(--serif);
+    font-style: normal;
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    background: linear-gradient(135deg, #ff9dbb 0%, #f2739c 55%, #ee5f8c 100%);
+    box-shadow: 0 10px 22px rgba(238, 95, 140, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+  }
+  button#dump:hover{
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 0 13px 26px rgba(238, 95, 140, 0.42);
+  }
+  button#dump:active{
+    transform: translateY(1px) scale(0.985);
+  }
+  button#dump.is-full{
+    filter: grayscale(0.55) opacity(0.75);
+  }
+  button#dump .arr{
+    font-family: var(--sans);
+    font-weight: 400;
+    margin-left: 5px;
+  }
+
+  /* Custom Jelly Cursor (V3 保留) */
+  #cursor-ring{
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1.6px solid rgba(242, 136, 171, 0.95);
+    z-index: 100;
+    pointer-events: none;
+    transform: translate(-50%, -50%) scale(1);
+    transition: background-color 0.12s ease-out, border-color 0.12s ease-out, opacity 0.12s ease-out;
+    background: rgba(242, 136, 171, 0);
+  }
+  #cursor-ring.grabbing{
+    background: rgba(242, 136, 171, 0.17);
+    border-color: rgba(232, 97, 141, 1);
+  }
+  #cursor-ring.orbiting{
+    background: rgba(207, 169, 110, 0.14);
+    border-color: rgba(180, 140, 82, 0.95);
+    border-style: dashed;
+  }
+  #cursor-ring.firefly{
+    background: rgba(255, 214, 102, 0.16);
+    border-color: rgba(235, 168, 38, 0.95);
+  }
+  #cursor-ring.hidden, #cursor-dot.hidden{
+    opacity: 0;
+  }
+  #cursor-dot{
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--pink-deep);
+    z-index: 100;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.12s ease-out, background-color 0.12s ease-out;
+  }
+  #cursor-dot.orbiting{
+    background: #b98c4b;
+  }
+  #cursor-dot.firefly{
+    background: #eb9d1a;
+  }
+
+  /* Toast */
+  #toast{
+    position: fixed;
+    bottom: 70px;
+    left: 36px;
+    z-index: 40;
+    padding: 8px 15px;
+    border-radius: 999px;
+    background: rgba(36, 30, 38, 0.82);
+    color: #fffaf8;
+    font-size: 12.5px;
+    letter-spacing: 0.04em;
+    backdrop-filter: blur(8px);
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
+    transition: all 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+    max-width: calc(100vw - 360px);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  #toast.show{
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Offline / Error Guard */
+  #offline{
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    background: rgba(241, 232, 221, 0.96);
+    color: var(--ink);
+    text-align: center;
+    padding: 40px;
+  }
+  #offline b{
+    display: block;
+    font-family: var(--serif);
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  #offline span{
+    display: block;
+    font-size: 14px;
+    color: var(--ink-soft);
+    max-width: 480px;
+    line-height: 1.75;
+    margin: 0 auto;
+  }
+  #offline .offline-actions{
+    margin-top: 18px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+  #offline .offline-btn{
+    border: none;
+    border-radius: 999px;
+    padding: 9px 18px;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    background: linear-gradient(135deg, #ff9dbb, #ee5f8c);
+    color: #fff;
+    box-shadow: 0 6px 16px rgba(238, 95, 140, 0.28);
+  }
+  #offline .offline-btn.secondary{
+    background: #fff;
+    color: var(--ink);
+    border: 1px solid rgba(36, 30, 38, 0.14);
+    box-shadow: 0 4px 12px rgba(36, 30, 38, 0.08);
+  }
+
+  @media (max-width: 780px){
+    #title-block{
+      top: 16px;
+      left: 16px;
+      max-width: calc(100vw - 120px);
+    }
+    h1.title{ font-size: 26px; }
+    .subtitle{ font-size: 12px; margin-top: 5px; }
+    .hint{ display: none; }
+    #zoom-bar{
+      left: 14px;
+      bottom: 16px;
+    }
+    #pane{
+      width: min(302px, calc(100vw - 24px));
+      top: 12px;
+      right: 12px;
+      bottom: 12px;
+    }
+    #pane-toggle{
+      top: 14px;
+      right: 14px;
+    }
+    #toast{
+      left: 50%;
+      max-width: calc(100vw - 28px);
+      transform: translate(-50%, 10px);
+      bottom: 66px;
+    }
+    #toast.show{
+      transform: translate(-50%, 0);
+    }
+  }
+</style>
+</head>
+<body>
+<canvas id="stage"></canvas>
+
+<div id="title-block">
+  <div class="kicker">软糖工房 · 手作瓷盘展台</div>
+  <h1 class="title">软糖 <span class="slash">/</span> 六角恐龙</h1>
+  <p class="subtitle">刚刚脱模的 Q 弹软糖六角恐龙。抓起拉扯、轻抚撸宠、投喂魔法糖豆，还能一键开启五声小乐团与失重 3D 萤火追光。</p>
+  <div class="hint">拖拽软糖 · 轻抚撸宠 · 双击盘面或半空投糖豆 · 右键/空白处转视角 · 滚轮缩放</div>
+</div>
+
+<div id="zoom-bar" aria-label="缩放与视角控制">
+  <button class="z-btn" id="btn-zoom-out" type="button" title="缩小">−</button>
+  <span id="zoom-pct">100%</span>
+  <button class="z-btn" id="btn-zoom-in" type="button" title="放大">＋</button>
+  <button class="z-btn reset-view" id="btn-view-reset" type="button" title="恢复默认视角与缩放">复位视角</button>
+</div>
+
+<button id="pane-toggle" type="button" aria-label="展开风味图鉴">🍬 展开图鉴</button>
+
+<aside id="pane">
+  <div class="panel-head">
+    <div>
+      <h2>今日风味图鉴</h2>
+      <div class="cap">五款五声软糖 · 瓷盘现正陈列</div>
+    </div>
+    <div class="head-actions">
+      <button class="mini-btn icon-only" id="btn-sound" type="button" title="开关果冻拟音与音乐盒">🔊</button>
+      <button class="mini-btn" id="btn-collapse" type="button" title="收起面板以获得更大活动视野">收起</button>
+    </div>
+  </div>
+
+  <div id="cards"></div>
+
+  <div class="ctrl">
+    <div class="row-label"><span>Q 弹晃动度</span><b id="wobble-val">45</b></div>
+    <input type="range" id="wobble" min="0" max="100" value="45" aria-label="Q 弹晃动度">
+
+    <div class="row-label" style="margin-top: 7px;"><span>实时果冻形变监测</span></div>
+    <div class="readouts">
+      <div class="readout">
+        <div class="num"><span id="stretch">0</span><small>%</small></div>
+        <div class="lab">拉伸率</div>
+      </div>
+      <div class="readout">
+        <div class="num"><span id="bounce">0.0</span></div>
+        <div class="lab">弹跳值</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="feed-box">
+    <button class="feed-main-btn" id="btn-feed" type="button">🍬 投喂微光糖豆</button>
+    <div class="candy-pills" id="candy-pills" role="radiogroup" aria-label="魔法糖豆类型">
+      <button class="candy-pill active" data-candy="random" type="button">随机盲盒</button>
+      <button class="candy-pill" data-candy="rainbow" type="button">🌈 变色</button>
+      <button class="candy-pill" data-candy="fizz" type="button">⚡ 跳跳</button>
+      <button class="candy-pill" data-candy="size" type="button">⭐ 大小</button>
+    </div>
+  </div>
+
+  <!-- 五声音乐盒毛玻璃控制条 -->
+  <div class="music-bar" id="music-bar" aria-label="五声音乐盒">
+    <button class="music-btn" id="btn-music-play" type="button" title="播放 / 暂停五声音乐盒">🎵</button>
+    <div class="music-center">
+      <div class="music-title-row">
+        <span class="music-title" id="music-title">《茉莉微风》</span>
+        <span class="music-tag">五声乐团</span>
+      </div>
+      <div class="music-leds" id="music-leds"></div>
+    </div>
+    <button class="music-btn" id="btn-music-next" type="button" title="切换下一首五声乐曲">⏭</button>
+  </div>
+
+  <div class="tool-row">
+    <button class="tool-btn" id="btn-firefly" type="button">✨ 萤火逗宠</button>
+    <button class="tool-btn" id="btn-zerog" type="button">🫧 失重悬浮</button>
+    <button class="tool-btn" id="btn-shake" type="button">🍮 摇一摇盘</button>
+    <button class="tool-btn" id="btn-reset" type="button">↺ 重置为 5 只</button>
+  </div>
+
+  <div class="count-chip">
+    <span id="ax-count">托盘现有 5 只软糖</span>
+    <span id="ax-cap">上限 10 只</span>
+  </div>
+  <button id="dump" type="button">再倒出几只六角恐龙<span class="arr">↓</span></button>
+</aside>
+
+<div id="cursor-ring"></div>
+<div id="cursor-dot"></div>
+<div id="toast"></div>
+
+<div id="offline">
+  <div>
+    <b>果冻引擎未能加载</b>
+    <span id="offline-detail">正在尝试连接 Three.js 渲染库，请检查网络连接后刷新重试。</span>
+    <div class="offline-actions">
+      <button class="offline-btn" type="button" onclick="location.reload()">↻ 重新加载</button>
+      <label class="offline-btn secondary" for="local-three-input">📂 选择本地 three.module.js / three.min.js 离线启动</label>
+      <input id="local-three-input" type="file" accept=".js,text/javascript,application/javascript" style="display:none">
+    </div>
+  </div>
+</div>
+
+<script>
+  window.__gummyBooted = false;
+  window.addEventListener('error', function(e){
+    if (!window.__gummyBooted && e && e.message && /three|cdn|import|webgl|syntax|reference|typeerror/i.test(String(e.message))) {
+      showOffline(e);
+    }
+  });
+  setTimeout(function(){
+    if (!window.__gummyBooted) showOffline(null);
+  }, 20000);
+
+  function showOffline(e){
+    if (window.__gummyBooted) return;
+    var el = document.getElementById('offline');
+    if (el) el.style.display = 'flex';
+    var d = document.getElementById('offline-detail');
+    if (d) {
+      d.textContent = (e && e.message)
+        ? ('加载失败：' + e.message)
+        : '无法从公共 CDN（jsdelivr / unpkg / npmmirror / cdnjs）拉取 Three.js，请检查网络连接并用系统浏览器（Chrome / Edge / Safari）打开。';
+    }
+  }
+</script>
+
+<script type="module">
+/* =========================================================================
+   1. 多 CDN 容错加载 Three.js（沿用 V3 实测高速 ES Module 通道 + 本地文件离线兜底）
+   ========================================================================= */
+const THREE_CDNS = [
+  'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js',
+  'https://unpkg.com/three@0.160.0/build/three.module.js',
+  'https://registry.npmmirror.com/three/0.160.0/files/build/three.module.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.module.min.js',
+];
+
+let THREE = null;
+let __startedApp = false;
+
+async function loadThree(limitMs = 5500){
+  for (const url of THREE_CDNS){
+    try {
+      const mod = await Promise.race([
+        import(url),
+        new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), limitMs)),
+      ]);
+      if (mod && mod.Scene && mod.WebGLRenderer){
+        THREE = mod;
+        return;
+      }
+    } catch (err){
+      console.warn('[软糖工房] CDN 加载跳过:', url, err && err.message);
+    }
+  }
+  throw new Error('所有公共 CDN 均未能成功加载 Three.js');
+}
+
+function startAppOnce(threeLib){
+  if (__startedApp) return;
+  __startedApp = true;
+  try {
+    THREE = threeLib;
+    init();
+    const off = document.getElementById('offline');
+    if (off) off.style.display = 'none';
+    window.__gummyBooted = true;
+  } catch (err){
+    __startedApp = false;
+    console.error('[软糖工房] 初始化异常:', err);
+    showOffline(err);
+  }
+}
+
+// 支持断网时手动选择本地 three.module.js 或 three.min.js 离线启动
+const localInput = document.getElementById('local-three-input');
+if (localInput){
+  localInput.addEventListener('change', async function(ev){
+    const file = ev.target.files && ev.target.files[0];
+    if (!file) return;
+    try {
+      const blobUrl = URL.createObjectURL(file);
+      try {
+        const mod = await import(blobUrl);
+        if (mod && mod.Scene && mod.WebGLRenderer){
+          startAppOnce(mod);
+          return;
+        }
+      } catch (_esmErr){
+        // 若非 ES Module，则按 UMD 脚本加载
+      } finally {
+        URL.revokeObjectURL(blobUrl);
+      }
+      const text = await file.text();
+      const s = document.createElement('script');
+      s.textContent = text;
+      document.head.appendChild(s);
+      if (window.THREE && window.THREE.Scene){
+        startAppOnce(window.THREE);
+      } else {
+        showOffline({ message: '所选文件不是有效的 Three.js 库文件' });
+      }
+    } catch (err){
+      showOffline(err);
+    }
+  });
+}
+
+/* =========================================================================
+   2. 基础数学工具 & 双总线防抢音 Web Audio 合成引擎
+   ========================================================================= */
+const TAU = Math.PI * 2;
+const clamp = (v, a, b) => (v < a ? a : (v > b ? b : v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const rand = (a, b) => a + Math.random() * (b - a);
+const safeNum = (v, fallback = 0) => (Number.isFinite(v) ? v : fallback);
+
+function angleDiff(a, b){
+  let d = (b - a) % TAU;
+  if (d > Math.PI) d -= TAU;
+  if (d < -Math.PI) d += TAU;
+  return d;
+}
+
+class JellySound {
+  constructor(){
+    this.enabled = true;
+    this.ctx = null;
+    this.masterGain = null;
+    this.compressor = null;
+    this.sfxGain = null;
+    this.musicGain = null;
+    this.sfxVoices = 0;
+    this.musicVoices = 0;
+    this.maxSfxVoices = 6;
+    this.maxMusicVoices = 4;
+    this.lastPlayedMap = new Map();
+  }
+  init(){
+    if (!this.ctx){
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      this.ctx = new AudioCtx();
+
+      this.compressor = this.ctx.createDynamicsCompressor();
+      this.compressor.threshold.setValueAtTime(-14, this.ctx.currentTime);
+      this.compressor.knee.setValueAtTime(18, this.ctx.currentTime);
+      this.compressor.ratio.setValueAtTime(6, this.ctx.currentTime);
+      this.compressor.attack.setValueAtTime(0.004, this.ctx.currentTime);
+      this.compressor.release.setValueAtTime(0.14, this.ctx.currentTime);
+
+      this.masterGain = this.ctx.createGain();
+      this.masterGain.gain.value = this.enabled ? 1.0 : 0.0;
+
+      // 独立双增益总线：交互音效与八音盒互不抢音、互不触发对方节流
+      this.sfxGain = this.ctx.createGain();
+      this.sfxGain.gain.value = 0.75;
+
+      this.musicGain = this.ctx.createGain();
+      this.musicGain.gain.value = 0.46;
+
+      this.sfxGain.connect(this.compressor);
+      this.musicGain.connect(this.compressor);
+      this.compressor.connect(this.masterGain);
+      this.masterGain.connect(this.ctx.destination);
+    }
+    if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume().catch(() => {});
+  }
+  setEnabled(flag){
+    this.enabled = !!flag;
+    if (this.masterGain && this.ctx){
+      const now = this.ctx.currentTime;
+      this.masterGain.gain.cancelScheduledValues(now);
+      this.masterGain.gain.setTargetAtTime(this.enabled ? 1.0 : 0.0, now, 0.018);
+    }
+  }
+  _canPlaySfx(key, minGapMs = 45){
+    if (!this.enabled) return false;
+    this.init();
+    if (!this.ctx || !this.sfxGain) return false;
+    if (this.sfxVoices >= this.maxSfxVoices) return false;
+    const nowMs = performance.now();
+    const prev = this.lastPlayedMap.get(key) || 0;
+    if (nowMs - prev < minGapMs) return false;
+    this.lastPlayedMap.set(key, nowMs);
+    return true;
+  }
+  _trackSfxVoice(osc){
+    this.sfxVoices++;
+    osc.onended = () => {
+      this.sfxVoices = Math.max(0, this.sfxVoices - 1);
+    };
+  }
+  playBoing(pitch = 1.0, vol = 0.13, sizeScale = 1.0){
+    if (!this._canPlaySfx('boing', 45)) return;
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'sine';
+    const sizePitch = clamp(1 / Math.max(0.55, sizeScale), 0.68, 1.45);
+    const base = 210 * clamp(pitch, 0.7, 1.5) * sizePitch;
+    osc.frequency.setValueAtTime(base * 0.72, now);
+    osc.frequency.exponentialRampToValueAtTime(base * 1.44, now + 0.075);
+    osc.frequency.exponentialRampToValueAtTime(base * 0.92, now + 0.17);
+    osc.frequency.exponentialRampToValueAtTime(base * 1.12, now + 0.27);
+    gain.gain.setValueAtTime(0.001, now);
+    gain.gain.linearRampToValueAtTime(clamp(vol, 0.03, 0.15), now + 0.018);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.30);
+    osc.connect(gain);
+    gain.connect(this.sfxGain);
+    this._trackSfxVoice(osc);
+    osc.start(now);
+    osc.stop(now + 0.32);
+  }
+  playPop(pitch = 1.0){
+    if (!this._canPlaySfx('pop', 45)) return;
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(300 * pitch, now);
+    osc.frequency.exponentialRampToValueAtTime(640 * pitch, now + 0.065);
+    gain.gain.setValueAtTime(0.001, now);
+    gain.gain.linearRampToValueAtTime(0.10, now + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.11);
+    osc.connect(gain);
+    gain.connect(this.sfxGain);
+    this._trackSfxVoice(osc);
+    osc.start(now);
+    osc.stop(now + 0.13);
+  }
+  playChime(freq = 523.25, sizeScale = 1.0, vol = 0.11){
+    if (!this._canPlaySfx('chime', 45)) return;
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'sine';
+    const sizePitch = clamp(1 / Math.max(0.55, sizeScale), 0.72, 1.42);
+    const f = clamp(freq * sizePitch, 220, 1760);
+    osc.frequency.setValueAtTime(f * 0.985, now);
+    osc.frequency.exponentialRampToValueAtTime(f, now + 0.035);
+    gain.gain.setValueAtTime(0.001, now);
+    gain.gain.linearRampToValueAtTime(clamp(vol, 0.03, 0.14), now + 0.014);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.42);
+    osc.connect(gain);
+    gain.connect(this.sfxGain);
+    this._trackSfxVoice(osc);
+    osc.start(now);
+    osc.stop(now + 0.45);
+  }
+  playHappyArpeggio(baseFreq = 523.25, sizeScale = 1.0){
+    if (!this._canPlaySfx('arp', 120)) return;
+    const ratios = [1.0, 1.122, 1.26, 1.5];
+    const sizePitch = clamp(1 / Math.max(0.55, sizeScale), 0.74, 1.38);
+    const now = this.ctx.currentTime;
+    ratios.forEach((r, idx) => {
+      if (this.sfxVoices >= this.maxSfxVoices) return;
+      const t0 = now + idx * 0.068;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(clamp(baseFreq * r * sizePitch, 240, 1800), t0);
+      gain.gain.setValueAtTime(0.001, t0);
+      gain.gain.linearRampToValueAtTime(0.085, t0 + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.001, t0 + 0.28);
+      osc.connect(gain);
+      gain.connect(this.sfxGain);
+      this._trackSfxVoice(osc);
+      osc.start(t0);
+      osc.stop(t0 + 0.30);
+    });
+  }
+  playNom(sizeScale = 1.0){
+    if (!this._canPlaySfx('nom', 60)) return;
+    const now = this.ctx.currentTime;
+    const sp = clamp(1 / Math.max(0.55, sizeScale), 0.72, 1.40);
+    [0, 0.095].forEach((offset, idx) => {
+      if (this.sfxVoices >= this.maxSfxVoices) return;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime((idx === 0 ? 350 : 480) * sp, now + offset);
+      osc.frequency.exponentialRampToValueAtTime((idx === 0 ? 235 : 620) * sp, now + offset + 0.08);
+      gain.gain.setValueAtTime(0.001, now + offset);
+      gain.gain.linearRampToValueAtTime(0.10, now + offset + 0.018);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + offset + 0.10);
+      osc.connect(gain);
+      gain.connect(this.sfxGain);
+      this._trackSfxVoice(osc);
+      osc.start(now + offset);
+      osc.stop(now + offset + 0.12);
+    });
+  }
+  playFizzPop(){
+    if (!this._canPlaySfx('fizz', 55)) return;
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'triangle';
+    const f = rand(520, 960);
+    osc.frequency.setValueAtTime(f, now);
+    osc.frequency.exponentialRampToValueAtTime(f * 1.65, now + 0.05);
+    gain.gain.setValueAtTime(0.001, now);
+    gain.gain.linearRampToValueAtTime(0.075, now + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.085);
+    osc.connect(gain);
+    gain.connect(this.sfxGain);
+    this._trackSfxVoice(osc);
+    osc.start(now);
+    osc.stop(now + 0.10);
+  }
+  // 果冻八音盒 / 卡林巴纯五声音色（独立 musicGain 通道，标准音准不受体型影响）
+  playMusicNote(freq, durSec = 0.55, accent = 1.0){
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx || !this.musicGain || this.musicVoices >= this.maxMusicVoices) return;
+
+    const now = this.ctx.currentTime;
+    const dur = clamp(durSec, 0.24, 1.45);
+    const peak = 0.25 * clamp(accent, 0.55, 1.25);
+
+    const oscFund = this.ctx.createOscillator();
+    const oscHarm = this.ctx.createOscillator();
+    const harmGain = this.ctx.createGain();
+    const envGain = this.ctx.createGain();
+
+    oscFund.type = 'sine';
+    oscFund.frequency.setValueAtTime(freq, now);
+
+    oscHarm.type = 'triangle';
+    oscHarm.frequency.setValueAtTime(freq * 2, now);
+    harmGain.gain.setValueAtTime(0.17, now);
+
+    envGain.gain.setValueAtTime(0.0001, now);
+    envGain.gain.linearRampToValueAtTime(peak, now + 0.012);
+    envGain.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+
+    oscFund.connect(envGain);
+    oscHarm.connect(harmGain);
+    harmGain.connect(envGain);
+    envGain.connect(this.musicGain);
+
+    this.musicVoices++;
+    oscFund.onended = () => {
+      this.musicVoices = Math.max(0, this.musicVoices - 1);
+      oscFund.disconnect();
+      oscHarm.disconnect();
+      harmGain.disconnect();
+      envGain.disconnect();
+    };
+
+    oscFund.start(now);
+    oscHarm.start(now);
+    oscFund.stop(now + dur + 0.03);
+    oscHarm.stop(now + dur + 0.03);
+  }
+}
+const sfx = new JellySound();
+
+/* =========================================================================
+   3. V3 原版五果味配置（宫 C5 / 商 D5 / 角 E5 / 徵 G5 / 羽 A5）+ 6 首纯五声乐曲
+   ========================================================================= */
+const FLAVORS = [
+  {
+    idx: 0, id: 'sakura', name: '樱花粉', note: '樱花清露 · 宫音 C5',
+    freq: 523.25,
+    color: 0xffa4c0, deep: 0xe2457a, uiHex: '#ff7ea8',
+    gill: 0xff5a91, gillDeep: 0xc22059,
+  },
+  {
+    idx: 1, id: 'peach', name: '蜜桃橙', note: '白桃果肉 · 商音 D5',
+    freq: 587.33,
+    color: 0xffb88a, deep: 0xe66524, uiHex: '#ff9658',
+    gill: 0xff755f, gillDeep: 0xcc3622,
+  },
+  {
+    idx: 2, id: 'lemon', name: '柠檬黄', note: '鲜柠果皮 · 角音 E5',
+    freq: 659.25,
+    color: 0xffe072, deep: 0xd18a08, uiHex: '#eab215',
+    gill: 0xffa834, gillDeep: 0xc9620a,
+  },
+  {
+    idx: 3, id: 'apple', name: '青苹果', note: '青苹脆甜 · 徵音 G5',
+    freq: 783.99,
+    color: 0xa3e582, deep: 0x3e9b26, uiHex: '#68c948',
+    gill: 0x5fd272, gillDeep: 0x20793c,
+  },
+  {
+    idx: 4, id: 'pine', name: '菠萝白', note: '凤梨奶霜 · 羽音 A5',
+    freq: 880.00,
+    color: 0xfae7b0, deep: 0xc8922c, uiHex: '#d9a13b',
+    gill: 0xffa68c, gillDeep: 0xd45b44,
+  },
+];
+
+const PENTATONIC_SONGS = [
+  {
+    title: '《茉莉微风》',
+    bpm: 96,
+    style: '江南婉转舒缓五声',
+    notes: [
+      2, 2, 3, 4, 4, 3, 2, -1,
+      1, 2, 3, 2, 1, 0, 1, -1,
+      2, 3, 4, 3, 2, 1, 0, -1,
+      1, 2, 1, 0, 1, 2, 0, -1,
+    ],
+  },
+  {
+    title: '《果冻接龙舞》',
+    bpm: 128,
+    style: '轻快跳脱 · 5色高频接龙',
+    notes: [
+      0, 1, 2, 3, 4, 3, 2, 1,
+      0, 2, 1, 3, 2, 4, 3, -1,
+      4, 3, 2, 1, 0, 1, 2, 3,
+      4, 2, 3, 1, 2, 0, 1, 0,
+    ],
+  },
+  {
+    title: '《星尘摇篮曲》',
+    bpm: 76,
+    style: '空灵慢板 · 绝配失重漂浮',
+    notes: [
+      0, -1, 2, -1, 3, -1, 2, -1,
+      4, -1, 3, 2, 1, -1, -1, -1,
+      2, -1, 3, -1, 4, -1, 3, -1,
+      2, -1, 1, 0, 0, -1, -1, -1,
+    ],
+  },
+  {
+    title: '《青梅竹马》',
+    bpm: 112,
+    style: '俏皮切分 · 两两对唱',
+    notes: [
+      0, 2, -1, 2, 3, 2, 1, -1,
+      1, 3, -1, 3, 4, 3, 2, -1,
+      2, 4, -1, 3, 2, 1, 2, -1,
+      3, 2, 1, 0, 1, -1, 0, -1,
+    ],
+  },
+  {
+    title: '《雨打青瓷》',
+    bpm: 104,
+    style: '清透水滴 · 上下行五声琶音',
+    notes: [
+      0, 1, 2, 3, 4, 3, 2, -1,
+      1, 2, 3, 4, 3, 2, 1, -1,
+      0, 2, 3, 4, 3, 2, 0, -1,
+      4, 3, 2, 1, 2, 1, 0, -1,
+    ],
+  },
+  {
+    title: '《软糖狂想曲》',
+    bpm: 138,
+    style: '热闹欢快 · 全员大合唱',
+    notes: [
+      0, 0, 2, 3, 4, 4, 3, 2,
+      1, 1, 2, 3, 2, 1, 0, -1,
+      2, 3, 4, 4, 3, 2, 3, 4,
+      3, 2, 1, 2, 3, 1, 0, 0,
+    ],
+  },
+];
+
+function validatePentatonicSongs(){
+  for (const song of PENTATONIC_SONGS){
+    if (song.notes.length !== 32){
+      throw new Error(`乐曲拍数异常: ${song.title}`);
+    }
+    for (const n of song.notes){
+      if (!Number.isInteger(n) || n < -1 || n > 4){
+        throw new Error(`非法五声音阶索引 ${n}: ${song.title}`);
+      }
+    }
+  }
+}
+validatePentatonicSongs();
+
+class PentatonicMusicBox {
+  constructor(soundEngine, onNoteCallback){
+    this.sound = soundEngine;
+    this.onNote = onNoteCallback;
+    this.playing = false;
+    this.songIndex = 0;
+    this.stepIndex = 0;
+    this.accum = 0;
+    this.beatPhase = 0;
+    this.pausedByHidden = false;
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden){
+        this.pausedByHidden = true;
+      } else {
+        this.pausedByHidden = false;
+        this.accum = 0;
+      }
+    });
+  }
+  get currentSong(){
+    return PENTATONIC_SONGS[this.songIndex];
+  }
+  get stepDuration(){
+    return (60 / this.currentSong.bpm) * 0.55;
+  }
+  toggle(){
+    this.sound.init();
+    this.playing = !this.playing;
+    if (this.playing){
+      this.accum = this.stepDuration * 0.92;
+    }
+    return this.playing;
+  }
+  nextSong(){
+    this.songIndex = (this.songIndex + 1) % PENTATONIC_SONGS.length;
+    this.stepIndex = 0;
+    this.accum = this.playing ? this.stepDuration * 0.90 : 0;
+    return this.currentSong;
+  }
+  update(dt){
+    if (!this.playing || this.pausedByHidden) return;
+    const safeDt = Math.min(dt, 0.08);
+    const stepDur = this.stepDuration;
+    this.accum += safeDt;
+    this.beatPhase = (this.beatPhase + safeDt / (stepDur * 2)) % 1;
+
+    if (this.accum >= stepDur){
+      this.accum -= stepDur;
+      if (this.accum > stepDur) this.accum = 0;
+
+      const song = this.currentSong;
+      const idx = this.stepIndex;
+      const noteIdx = song.notes[idx];
+      this.stepIndex = (this.stepIndex + 1) % song.notes.length;
+
+      if (noteIdx >= 0 && noteIdx <= 4){
+        const isDownbeat = (idx % 4 === 0);
+        const accent = isDownbeat ? 1.08 : 0.92;
+        const nextIsRest = song.notes[this.stepIndex] === -1;
+        const noteDur = stepDur * (nextIsRest ? 2.45 : 1.55);
+
+        this.sound.playMusicNote(FLAVORS[noteIdx].freq, noteDur, accent);
+        if (this.onNote) this.onNote(noteIdx, accent, isDownbeat);
+      }
+    }
+  }
+}
+
+const FEED_CANDY_COLORS = [0xff6b8b, 0xffd166, 0x56d88f, 0x68c3ff, 0xc38bff, 0xff9f68];
+
+/* =========================================================================
+   4. V4 立体香槟金边瓷盘与全局物理常量（碰撞边界 1:1 严格对齐）
+   ========================================================================= */
+const MAX_AX = 10;
+const MAX_LOOSE_CANDIES = 6;
+const H_STEP = 1 / 60;
+const GRAVITY = 28;
+
+const MODEL_BASE_SCALE = 1.12;
+const BODY_RADIUS = 0.64;
+const TRAY_HALF_X = 4.65;
+const TRAY_HALF_Z = 3.20;
+const TRAY_CORNER_R = 1.15;
+const TRAY_FLOOR_Y = 0.08;
+const ZERO_G_CEILING_Y = 5.85;
+
+const axolotls = [];
+const looseCandies = [];
+const particlePool = [];
+const heartPool = [];
+const notePool = [];
+
+let renderer, scene, camera;
+let glowTex, heartTex, noteTex, sharedGeos;
+let trayGoldMat = null;
+let trayGoldPulse = 0;
+let petUidCounter = 0;
+
+// 玩法全局状态
+let selectedCandyMode = 'random'; // 'random' | 'rainbow' | 'fizz' | 'size'
+let fireflyMode = false;
+let zeroGravity = false;
+
+const fireflyState = {
+  active: false,
+  group: null,
+  halo: null,
+  light: null,
+  floorRing: null,
+  floorRingMat: null,
+  pos: null,
+  target: null,
+  lastSparkleAt: 0,
+};
+
+// 相机轨道与解耦缩放状态
+const camState = {
+  target: null,
+  baseDist: 12.6,
+  zoom: 1.0,
+  targetZoom: 1.0,
+  minZoom: 0.48,
+  maxZoom: 1.48,
+  yaw: 0.0,
+  targetYaw: 0.0,
+  pitch: 0.52,
+  targetPitch: 0.52,
+  minPitch: 0.22,
+  maxPitch: 1.26,
+  defaultYaw: 0.0,
+  defaultPitch: 0.52,
+  defaultZoom: 1.0,
+};
+
+// 交互与撸宠追踪状态
+let grab = null;
+let orbitDrag = null;
+let hoverAx = null;
+let lastRubAx = null;
+let lastRubClientX = 0;
+let lastRubClientY = 0;
+let pointerOverUI = false;
+let panelCollapsed = false;
+let rightPanelSafeMarginPx = 336;
+
+const activePointers = new Map();
+let pinchState = null;
+let lastEmptyTap = { t: 0, x: 0, y: 0 };
+
+const mouse = {
+  x: 0, y: 0,
+  px: window.innerWidth * 0.4,
+  py: window.innerHeight * 0.5,
+  activeAt: 0,
+};
+
+let wobble = 45 / 50;
+let time = 0, lastT = 0, acc = 0;
+let stretchMeter = 0, bounceMeter = 0;
+
+// 复用临时数学对象
+let _raycaster, _ndcVec, _v1, _upVec, _qPull, _qInv;
+let _planeTray, _planeFirefly, _planeFirefly3D, _zeroGCenter, _camDir, _hitPt;
+
+/* =========================================================================
+   5. V4 瓷盘圆角内壁碰撞限幅（返回碰撞点与法线，1:1 匹配 V4 围壁）
+   ========================================================================= */
+function clampToTrayRoundedRect(x, z, radius = BODY_RADIUS){
+  const r = Math.max(0.15, radius);
+  const hx = Math.max(0.45, TRAY_HALF_X - r);
+  const hz = Math.max(0.45, TRAY_HALF_Z - r);
+  const cr = clamp(TRAY_CORNER_R - r * 0.35, 0.20, Math.min(hx - 0.1, hz - 0.1));
+
+  let cx = clamp(x, -hx, hx);
+  let cz = clamp(z, -hz, hz);
+  let hitX = (cx !== x);
+  let hitZ = (cz !== z);
+  let nx = 0, nz = 0;
+  if (hitX) nx = x > hx ? -1 : 1;
+  if (hitZ) nz = z > hz ? -1 : 1;
+
+  const ix = hx - cr;
+  const iz = hz - cr;
+  const ax = Math.abs(cx);
+  const az = Math.abs(cz);
+  if (ax > ix && az > iz){
+    const dx = ax - ix;
+    const dz = az - iz;
+    const dist = Math.hypot(dx, dz);
+    if (dist > cr && dist > 1e-6){
+      const sx = cx >= 0 ? 1 : -1;
+      const sz = cz >= 0 ? 1 : -1;
+      cx = sx * (ix + (dx / dist) * cr);
+      cz = sz * (iz + (dz / dist) * cr);
+      nx = -sx * (dx / dist);
+      nz = -sz * (dz / dist);
+      hitX = true;
+      hitZ = true;
+    }
+  }
+  return { x: cx, z: cz, hit: hitX || hitZ, nx, nz };
+}
+
+function makeRoundedRectShape(hw, hh, r){
+  const s = new THREE.Shape();
+  s.moveTo(-hw + r, -hh);
+  s.lineTo(hw - r, -hh);
+  s.quadraticCurveTo(hw, -hh, hw, -hh + r);
+  s.lineTo(hw, hh - r);
+  s.quadraticCurveTo(hw, hh, hw - r, hh);
+  s.lineTo(-hw + r, hh);
+  s.quadraticCurveTo(-hw, hh, -hw, hh - r);
+  s.lineTo(-hw, -hh + r);
+  s.quadraticCurveTo(-hw, -hh, -hw + r, -hh);
+  return s;
+}
+
+/* =========================================================================
+   6. V4 程序化彩石水磨石工作台与立体香槟金边瓷盘
+   ========================================================================= */
+function createTerrazzoTexture(){
+  const c = document.createElement('canvas');
+  c.width = 512;
+  c.height = 512;
+  const g = c.getContext('2d');
+  g.fillStyle = '#efe7dc';
+  g.fillRect(0, 0, 512, 512);
+
+  let seed = 2026;
+  const prng = () => {
+    seed = (seed * 16807) % 2147483647;
+    return (seed - 1) / 2147483646;
+  };
+
+  for (let i = 0; i < 2400; i++){
+    g.fillStyle = i % 2 === 0 ? 'rgba(195,180,165,0.16)' : 'rgba(255,255,255,0.25)';
+    g.fillRect(prng() * 512, prng() * 512, 2, 2);
+  }
+  const chips = ['#e8b6a6', '#d8c29e', '#a9c7b7', '#b9c8d6', '#d7b7c6', '#c6b4a2', '#f7efe3'];
+  for (let i = 0; i < 240; i++){
+    const cx = prng() * 512;
+    const cy = prng() * 512;
+    const r = 3 + prng() * 11;
+    const sides = 4 + Math.floor(prng() * 4);
+    g.save();
+    g.translate(cx, cy);
+    g.rotate(prng() * TAU);
+    g.beginPath();
+    for (let s = 0; s < sides; s++){
+      const ang = (s / sides) * TAU;
+      const rr = r * (0.62 + prng() * 0.45);
+      const px = Math.cos(ang) * rr;
+      const py = Math.sin(ang) * rr;
+      if (s === 0) g.moveTo(px, py); else g.lineTo(px, py);
+    }
+    g.closePath();
+    g.fillStyle = chips[Math.floor(prng() * chips.length)];
+    g.globalAlpha = 0.65;
+    g.fill();
+    g.restore();
+  }
+
+  const tex = new THREE.CanvasTexture(c);
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(6, 6);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+function buildAtelierStage(){
+  const maxAniso = renderer.capabilities.getMaxAnisotropy ? Math.min(8, renderer.capabilities.getMaxAnisotropy()) : 4;
+  const tzTex = createTerrazzoTexture();
+  tzTex.anisotropy = maxAniso;
+
+  const tableGeo = new THREE.PlaneGeometry(54, 54);
+  const tableMat = new THREE.MeshStandardMaterial({
+    map: tzTex,
+    roughness: 0.86,
+    metalness: 0.02,
+  });
+  const tableMesh = new THREE.Mesh(tableGeo, tableMat);
+  tableMesh.rotation.x = -Math.PI / 2;
+  tableMesh.position.y = -0.26;
+  tableMesh.receiveShadow = true;
+  scene.add(tableMesh);
+
+  const trayGroup = new THREE.Group();
+  scene.add(trayGroup);
+
+  const glazeMat = new THREE.MeshPhysicalMaterial({
+    color: 0xfffcf7,
+    roughness: 0.16,
+    metalness: 0.02,
+    clearcoat: 0.9,
+    clearcoatRoughness: 0.12,
+  });
+
+  // 盘底主体（抵消 bevelThickness: 0.06，确保内底釉面顶面精准对齐 y = TRAY_FLOOR_Y）
+  const baseShape = makeRoundedRectShape(TRAY_HALF_X + 0.32, TRAY_HALF_Z + 0.32, TRAY_CORNER_R + 0.25);
+  const baseGeo = new THREE.ExtrudeGeometry(baseShape, {
+    depth: 0.24,
+    bevelEnabled: true,
+    bevelThickness: 0.06,
+    bevelSize: 0.06,
+    bevelSegments: 4,
+    curveSegments: 28,
+  });
+  baseGeo.rotateX(Math.PI / 2);
+  const baseMesh = new THREE.Mesh(baseGeo, glazeMat);
+  baseMesh.position.y = TRAY_FLOOR_Y - 0.06;
+  baseMesh.receiveShadow = true;
+  baseMesh.castShadow = true;
+  trayGroup.add(baseMesh);
+
+  // 立体微翘外缘围壁
+  const wallOuter = makeRoundedRectShape(TRAY_HALF_X + 0.38, TRAY_HALF_Z + 0.38, TRAY_CORNER_R + 0.28);
+  const wallHole = makeRoundedRectShape(TRAY_HALF_X + 0.04, TRAY_HALF_Z + 0.04, TRAY_CORNER_R);
+  wallOuter.holes.push(wallHole);
+  const wallGeo = new THREE.ExtrudeGeometry(wallOuter, {
+    depth: 0.42,
+    bevelEnabled: true,
+    bevelThickness: 0.07,
+    bevelSize: 0.05,
+    bevelSegments: 4,
+    curveSegments: 28,
+  });
+  wallGeo.rotateX(-Math.PI / 2);
+  const wallMesh = new THREE.Mesh(wallGeo, glazeMat);
+  wallMesh.position.y = TRAY_FLOOR_Y - 0.02;
+  wallMesh.castShadow = true;
+  wallMesh.receiveShadow = true;
+  trayGroup.add(wallMesh);
+
+  // 香槟金描边（保存为 trayGoldMat，缺味兜底暖金微闪）
+  trayGoldMat = new THREE.MeshStandardMaterial({
+    color: 0xe9c47b,
+    emissive: 0xf5c869,
+    emissiveIntensity: 0.0,
+    roughness: 0.28,
+    metalness: 0.78,
+  });
+  const rimShape = makeRoundedRectShape(TRAY_HALF_X + 0.22, TRAY_HALF_Z + 0.22, TRAY_CORNER_R + 0.15);
+  const pts2d = rimShape.getSpacedPoints(120);
+  const rimPts3d = pts2d.map(p => new THREE.Vector3(p.x, TRAY_FLOOR_Y + 0.46, -p.y));
+  const rimCurve = new THREE.CatmullRomCurve3(rimPts3d, true);
+  const rimGeo = new THREE.TubeGeometry(rimCurve, 140, 0.045, 10, true);
+  const rimMesh = new THREE.Mesh(rimGeo, trayGoldMat);
+  trayGroup.add(rimMesh);
+}
+
+/* =========================================================================
+   7. 共享几何体、离屏贴图与三套独立对象池（particlePool / heartPool / notePool）
+   ========================================================================= */
+function createSoftGlowTexture(){
+  const c = document.createElement('canvas');
+  c.width = c.height = 128;
+  const g = c.getContext('2d');
+  const grad = g.createRadialGradient(64, 64, 4, 64, 64, 62);
+  grad.addColorStop(0, 'rgba(255,255,255,0.92)');
+  grad.addColorStop(0.45, 'rgba(255,255,255,0.42)');
+  grad.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = grad;
+  g.fillRect(0, 0, 128, 128);
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+function createNoteTexture(){
+  const c = document.createElement('canvas');
+  c.width = c.height = 128;
+  const g = c.getContext('2d');
+  g.clearRect(0, 0, 128, 128);
+  g.shadowColor = 'rgba(255, 255, 255, 0.92)';
+  g.shadowBlur = 12;
+  g.fillStyle = '#ffffff';
+  g.textAlign = 'center';
+  g.textBaseline = 'middle';
+  g.font = 'bold 88px "PingFang SC", "Segoe UI Symbol", "Apple Symbols", sans-serif';
+  g.fillText('♪', 64, 68);
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+function buildHeartGeometry(){
+  const s = new THREE.Shape();
+  s.moveTo(0, -0.10);
+  s.bezierCurveTo(0.14, 0.0, 0.16, 0.14, 0.07, 0.16);
+  s.bezierCurveTo(0.02, 0.17, 0, 0.12, 0, 0.09);
+  s.bezierCurveTo(0, 0.12, -0.02, 0.17, -0.07, 0.16);
+  s.bezierCurveTo(-0.16, 0.14, -0.14, 0.0, 0, -0.10);
+  return new THREE.ShapeGeometry(s, 14);
+}
+
+function buildSharedGeometries(){
+  const head = new THREE.SphereGeometry(0.42, 26, 22);
+  head.scale(1.14, 0.9, 1.0);
+  const torso = new THREE.CapsuleGeometry(0.32, 0.42, 14, 22);
+  torso.rotateX(Math.PI / 2);
+  const tail = new THREE.ConeGeometry(0.24, 0.72, 20);
+  tail.rotateX(-Math.PI / 2);
+  const blush = new THREE.SphereGeometry(0.065, 10, 10);
+  blush.scale(1.2, 0.7, 0.4);
+  const decal = new THREE.CircleGeometry(0.72, 32);
+  decal.rotateX(-Math.PI / 2);
+
+  return {
+    head,
+    torso,
+    tail,
+    fin: new THREE.PlaneGeometry(0.18, 0.66),
+    leg: new THREE.CapsuleGeometry(0.085, 0.16, 8, 12),
+    gillStalk: new THREE.CapsuleGeometry(0.042, 0.24, 6, 8),
+    gillFrond: new THREE.SphereGeometry(0.068, 10, 10),
+    eye: new THREE.SphereGeometry(0.056, 14, 14),
+    eyeSpec: new THREE.SphereGeometry(0.02, 8, 8),
+    blush,
+    smile: new THREE.TorusGeometry(0.085, 0.016, 8, 18, Math.PI * 0.85),
+    singMouth: new THREE.TorusGeometry(0.048, 0.017, 8, 18),
+    coreCandy: new THREE.OctahedronGeometry(0.16, 1),
+    decal,
+    looseCandy: new THREE.SphereGeometry(0.165, 18, 16),
+    candyHalo: new THREE.TorusGeometry(0.25, 0.023, 8, 24),
+    sizeRing: new THREE.TorusGeometry(0.18, 0.032, 8, 20),
+    particle: new THREE.SphereGeometry(0.062, 10, 8),
+    heart: buildHeartGeometry(),
+  };
+}
+
+function initParticlePool(count = 52){
+  for (let i = 0; i < count; i++){
+    const mat = new THREE.MeshPhysicalMaterial({
+      color: 0xffa6c2,
+      roughness: 0.12,
+      clearcoat: 1.0,
+      transparent: true,
+      opacity: 0.0,
+    });
+    const mesh = new THREE.Mesh(sharedGeos.particle, mat);
+    mesh.visible = false;
+    scene.add(mesh);
+    particlePool.push({
+      mesh,
+      active: false,
+      vel: new THREE.Vector3(),
+      life: 0,
+      maxLife: 0.6,
+      baseScale: 1,
+      gravityScale: 1.0,
+    });
+  }
+}
+
+function spawnJellyParticles(x, y, z, colorHex, count = 6, gravityScale = 1.0){
+  let spawned = 0;
+  for (let i = 0; i < particlePool.length && spawned < count; i++){
+    const p = particlePool[i];
+    if (p.active) continue;
+    p.active = true;
+    p.life = 1.0;
+    p.maxLife = 0.44 + Math.random() * 0.30;
+    p.baseScale = 0.62 + Math.random() * 0.85;
+    p.gravityScale = gravityScale;
+
+    const ang = Math.random() * TAU;
+    const spd = gravityScale < 0.2 ? (0.4 + Math.random() * 0.9) : (1.3 + Math.random() * 2.1);
+    const vy = gravityScale < 0.2 ? rand(-0.4, 0.9) : (2.0 + Math.random() * 2.3);
+    p.vel.set(Math.cos(ang) * spd, vy, Math.sin(ang) * spd);
+
+    p.mesh.position.set(x, y, z);
+    p.mesh.scale.setScalar(p.baseScale);
+    p.mesh.material.color.setHex(colorHex);
+    p.mesh.material.opacity = 0.88;
+    p.mesh.visible = true;
+    spawned++;
+  }
+}
+
+function updateParticles(dt){
+  for (const p of particlePool){
+    if (!p.active) continue;
+    p.life -= dt / p.maxLife;
+    if (p.life <= 0){
+      p.active = false;
+      p.mesh.visible = false;
+      continue;
+    }
+    const g = zeroGravity ? 1.5 : 13.5;
+    p.vel.y -= g * p.gravityScale * dt;
+    p.mesh.position.addScaledVector(p.vel, dt);
+    if (p.mesh.position.y < TRAY_FLOOR_Y + 0.05){
+      p.mesh.position.y = TRAY_FLOOR_Y + 0.05;
+      p.vel.y *= -0.4;
+    }
+    p.mesh.scale.setScalar(p.baseScale * p.life);
+    p.mesh.material.opacity = p.life * 0.85;
+  }
+}
+
+// V3 几何爱心对象池（仅用于轻抚撸一撸彩蛋）
+function initHeartPool(count = 20){
+  for (let i = 0; i < count; i++){
+    const mat = new THREE.MeshBasicMaterial({
+      color: 0xff6b9d,
+      transparent: true,
+      opacity: 0,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+    });
+    const mesh = new THREE.Mesh(sharedGeos.heart, mat);
+    mesh.visible = false;
+    mesh.renderOrder = 6;
+    scene.add(mesh);
+    heartPool.push({
+      mesh,
+      active: false,
+      vel: new THREE.Vector3(),
+      life: 0,
+      maxLife: 1.0,
+      baseScale: 1.0,
+      swayPhase: 0,
+    });
+  }
+}
+
+function spawnHeartBurst(x, y, z, count = 4){
+  const heartColors = [0xff6b9d, 0xff8fab, 0xffb3c6, 0xffd166];
+  let spawned = 0;
+  for (let i = 0; i < heartPool.length && spawned < count; i++){
+    const h = heartPool[i];
+    if (h.active) continue;
+    h.active = true;
+    h.life = 1.0;
+    h.maxLife = 0.95 + Math.random() * 0.35;
+    h.baseScale = 0.85 + Math.random() * 0.55;
+    h.swayPhase = Math.random() * TAU;
+
+    const ang = (spawned / count) * TAU + Math.random() * 0.7;
+    h.vel.set(Math.cos(ang) * 0.55, 1.35 + Math.random() * 0.55, Math.sin(ang) * 0.55);
+    h.mesh.position.set(x + Math.cos(ang) * 0.22, y + 0.35, z + Math.sin(ang) * 0.22);
+    h.mesh.material.color.setHex(heartColors[spawned % heartColors.length]);
+    h.mesh.material.opacity = 0.95;
+    h.mesh.scale.setScalar(0.01);
+    h.mesh.visible = true;
+    spawned++;
+  }
+}
+
+function updateHearts(dt, elapsed){
+  for (const h of heartPool){
+    if (!h.active) continue;
+    h.life -= dt / h.maxLife;
+    if (h.life <= 0){
+      h.active = false;
+      h.mesh.visible = false;
+      continue;
+    }
+    h.mesh.position.x += (h.vel.x + Math.sin(elapsed * 5 + h.swayPhase) * 0.25) * dt;
+    h.mesh.position.y += h.vel.y * dt;
+    h.mesh.position.z += h.vel.z * dt;
+    h.vel.y *= Math.pow(0.96, dt * 60);
+
+    h.mesh.quaternion.copy(camera.quaternion);
+    const popIn = clamp((1.0 - h.life) / 0.18, 0.15, 1.0);
+    const sc = h.baseScale * popIn * (0.55 + h.life * 0.55);
+    h.mesh.scale.setScalar(sc);
+    h.mesh.material.opacity = clamp(h.life * 1.15, 0, 0.92);
+  }
+}
+
+// 预分配微光小音符对象池（18 个 THREE.Sprite，与粒子池、爱心池彻底分离）
+function initNotePool(count = 18){
+  for (let i = 0; i < count; i++){
+    const mat = new THREE.SpriteMaterial({
+      map: noteTex,
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0,
+      depthWrite: false,
+    });
+    const sprite = new THREE.Sprite(mat);
+    sprite.visible = false;
+    sprite.renderOrder = 7;
+    scene.add(sprite);
+    notePool.push({
+      sprite,
+      mat,
+      active: false,
+      vel: new THREE.Vector3(),
+      life: 0,
+      maxLife: 1.15,
+      phase: 0,
+    });
+  }
+}
+
+function spawnMusicNoteSprite(x, y, z, colorHex, sizeScale = 1.0){
+  for (let i = 0; i < notePool.length; i++){
+    const n = notePool[i];
+    if (n.active) continue;
+    n.active = true;
+    n.life = 0;
+    n.maxLife = 1.05 + Math.random() * 0.30;
+    n.phase = Math.random() * TAU;
+    n.mat.color.set(colorHex);
+    n.mat.opacity = 0.96;
+    n.sprite.position.set(
+      x + rand(-0.24, 0.24),
+      y + 0.85 * sizeScale,
+      z + rand(-0.24, 0.24)
+    );
+    n.vel.set(rand(-0.28, 0.28), 1.05 + Math.random() * 0.32, rand(-0.28, 0.28));
+    n.sprite.scale.setScalar(0.32);
+    n.sprite.visible = true;
+    break;
+  }
+}
+
+function updateNotes(dt){
+  for (const n of notePool){
+    if (!n.active) continue;
+    n.life += dt;
+    if (n.life >= n.maxLife){
+      n.active = false;
+      n.sprite.visible = false;
+      continue;
+    }
+    const t = n.life / n.maxLife;
+    n.sprite.position.addScaledVector(n.vel, dt);
+    n.sprite.position.x += Math.sin(t * 6.5 + n.phase) * 0.011;
+    const sc = t < 0.18 ? lerp(0.18, 0.45, t / 0.18) : lerp(0.45, 0.30, (t - 0.18) / 0.82);
+    n.sprite.scale.setScalar(sc);
+    n.mat.opacity = t < 0.55 ? 0.96 : 0.96 * (1 - (t - 0.55) / 0.45);
+  }
+}
+
+/* =========================================================================
+   8. 双模态萤火逗宠棒（地面水平面 + 失重垂直相机视线 3D 平面 + floorRing）
+   ========================================================================= */
+function initFirefly(){
+  fireflyState.pos = new THREE.Vector3(0, 1.05, 0);
+  fireflyState.target = new THREE.Vector3(0, 1.05, 0);
+
+  const g = new THREE.Group();
+  const core = new THREE.Mesh(
+    new THREE.SphereGeometry(0.14, 18, 16),
+    new THREE.MeshBasicMaterial({ color: 0xfff5be })
+  );
+  g.add(core);
+
+  const haloMat = new THREE.SpriteMaterial({
+    map: glowTex,
+    color: 0xffdf7d,
+    transparent: true,
+    opacity: 0.88,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+  });
+  const halo = new THREE.Sprite(haloMat);
+  halo.scale.setScalar(1.32);
+  g.add(halo);
+
+  const light = new THREE.PointLight(0xffcf56, 2.2, 6.4, 1.6);
+  g.add(light);
+
+  g.visible = false;
+  scene.add(g);
+
+  // 失重高度深度参考环：紧贴瓷盘釉面 y = TRAY_FLOOR_Y + 0.042
+  const ringGeo = new THREE.RingGeometry(0.28, 0.35, 44);
+  ringGeo.rotateX(-Math.PI / 2);
+  const ringMat = new THREE.MeshBasicMaterial({
+    color: 0xf6d884,
+    transparent: true,
+    opacity: 0.44,
+    side: THREE.DoubleSide,
+    depthWrite: false,
+  });
+  const floorRing = new THREE.Mesh(ringGeo, ringMat);
+  floorRing.position.set(0, TRAY_FLOOR_Y + 0.042, 0);
+  floorRing.visible = false;
+  scene.add(floorRing);
+
+  fireflyState.group = g;
+  fireflyState.halo = halo;
+  fireflyState.light = light;
+  fireflyState.floorRing = floorRing;
+  fireflyState.floorRingMat = ringMat;
+}
+
+function updateFirefly(dt, elapsed){
+  const shouldShow = fireflyMode && !grab && !orbitDrag && !pointerOverUI && !pinchState;
+  fireflyState.active = shouldShow;
+  if (!fireflyState.group) return;
+
+  fireflyState.group.visible = shouldShow;
+  if (fireflyState.floorRing){
+    fireflyState.floorRing.visible = !!(zeroGravity && shouldShow);
+  }
+  if (!shouldShow) return;
+
+  const safeX = clamp(mouse.px, 30, Math.max(120, window.innerWidth - rightPanelSafeMarginPx));
+  const safeY = clamp(mouse.py, 30, window.innerHeight - 30);
+  const ndc = ndcFromClient(safeX, safeY);
+  _raycaster.setFromCamera(_ndcVec.set(ndc.x, ndc.y), camera);
+
+  if (!zeroGravity){
+    const hit = _raycaster.ray.intersectPlane(_planeFirefly, _hitPt);
+    if (hit){
+      const cl = clampToTrayRoundedRect(hit.x, hit.z, 0.48);
+      fireflyState.target.set(cl.x, 0.95, cl.z);
+    }
+  } else {
+    // 失重真 3D 平面：始终垂直于当前相机视线，过太空舱中心 (0, 2.75, 0)
+    camera.getWorldDirection(_camDir);
+    _planeFirefly3D.setFromNormalAndCoplanarPoint(_camDir, _zeroGCenter);
+    const hit = _raycaster.ray.intersectPlane(_planeFirefly3D, _hitPt);
+    if (hit){
+      const cl = clampToTrayRoundedRect(hit.x, hit.z, 0.48);
+      const cy = clamp(hit.y, TRAY_FLOOR_Y + 0.72, ZERO_G_CEILING_Y - 0.65);
+      fireflyState.target.set(cl.x, cy, cl.z);
+    }
+  }
+
+  const prevX = fireflyState.pos.x;
+  const prevY = fireflyState.pos.y;
+  const prevZ = fireflyState.pos.z;
+  const k = 1 - Math.exp(-13 * dt);
+  fireflyState.pos.lerp(fireflyState.target, k);
+
+  const bobY = Math.sin(elapsed * 4.8) * 0.09;
+  const bobX = Math.cos(elapsed * 3.2) * 0.04;
+  fireflyState.group.position.set(
+    fireflyState.pos.x + bobX,
+    fireflyState.pos.y + bobY,
+    fireflyState.pos.z
+  );
+
+  const pulse = 1.24 + Math.sin(elapsed * 8.2) * 0.18;
+  fireflyState.halo.scale.setScalar(pulse);
+  fireflyState.light.intensity = 2.0 + Math.sin(elapsed * 8.2) * 0.38;
+
+  // 更新盘面高度深度参考环
+  if (fireflyState.floorRing && fireflyState.floorRing.visible){
+    fireflyState.floorRing.position.set(fireflyState.pos.x, TRAY_FLOOR_Y + 0.042, fireflyState.pos.z);
+    const hNorm = clamp((fireflyState.pos.y - TRAY_FLOOR_Y) / (ZERO_G_CEILING_Y - TRAY_FLOOR_Y), 0, 1);
+    fireflyState.floorRing.scale.setScalar(0.75 + hNorm * 1.05);
+    fireflyState.floorRingMat.opacity = clamp(0.56 - hNorm * 0.34, 0.14, 0.56);
+  }
+
+  const moveSpd = Math.hypot(
+    fireflyState.pos.x - prevX,
+    fireflyState.pos.y - prevY,
+    fireflyState.pos.z - prevZ
+  ) / Math.max(dt, 0.008);
+  if (moveSpd > 2.3 && elapsed - fireflyState.lastSparkleAt > 0.09){
+    fireflyState.lastSparkleAt = elapsed;
+    spawnJellyParticles(fireflyState.pos.x, fireflyState.pos.y + bobY, fireflyState.pos.z, 0xffe072, 1, 0.15);
+  }
+}
+
+/* =========================================================================
+   9. V4 六角恐龙模型 + V3 3D 弹性物理容器（JellyAxolotlPet）
+   ========================================================================= */
+function computeSwarmOffset(uid){
+  const goldenAngle = 2.399963229728653;
+  const y = clamp(0.68 - ((uid % 7) / 6) * 1.28, -0.72, 0.72);
+  const r = Math.sqrt(Math.max(0.05, 1 - y * y));
+  const theta = uid * goldenAngle;
+  return new THREE.Vector3(Math.cos(theta) * r, y, Math.sin(theta) * r).normalize();
+}
+
+class JellyAxolotlPet {
+  constructor(flavor, x, z, yaw, y, dropVel){
+    this.uid = petUidCounter++;
+    this.flavor = flavor;
+    this.id = Math.random().toString(36).slice(2, 8);
+
+    this.sizeScale = 1.0;
+    this.targetSizeScale = 1.0;
+
+    // 物理状态（y 为脚底触盘高度）
+    this.pos = { x, y, z };
+    this.vel = { x: 0, y: -(dropVel || 0), z: 0 };
+    this.yaw = yaw;
+    this.yawVel = 0;
+    this.pitch = 0;
+    this.roll = 0;
+
+    this.floatY = clamp(1.55 + (this.uid % 5) * 0.56, 1.25, 4.35);
+    this.swarmOffset = computeSwarmOffset(this.uid);
+
+    // 弹性挤压与 V3 3D 方向拉扯弹簧
+    this.squashPos = 0;
+    this.squashVel = 0;
+    this.pullVec = new THREE.Vector3(0, 0, 0);
+    this.pullVel = new THREE.Vector3(0, 0, 0);
+    this.pullBiasZ = 0;
+
+    // 互动与状态计时器
+    this.isGrabbed = false;
+    this.squishAmt = 0;
+    this.currentStrain = 0;
+    this.phase = Math.random() * TAU;
+    this.onFloor = false;
+    this.lastLandSound = 0;
+
+    // 彩虹波纹变色 & 跳跳狂欢
+    this.colorRipple = null;
+    this.fizzTimer = 0;
+    this.fizzPulseTimer = 0;
+
+    // V3 轻抚撸一撸状态
+    this.rubEnergy = 0;
+    this.rubCooldown = 0;
+    this.rubHappyTimer = 0;
+    this.happyTimer = 0;
+    this.eatHappyTimer = 0;
+
+    // 自然眨眼
+    this.blinkTimer = rand(1.8, 5.2);
+    this.blinkDur = 0;
+
+    // 五声果冻小乐团合唱视觉层状态
+    this.singPulse = 0;
+    this.pendingSingTimer = -1;
+    this.pendingSingAccent = 1.0;
+    this.musicBounceTimer = 0;
+    this.nodPulse = 0;
+
+    // P6 慵懒惬意型双阶段自主生态
+    this.idleMode = (this.uid % 2 === 0) ? 'rest' : 'stroll';
+    this.idleModeTimer = rand(2.2, 5.4);
+    this.idleTarget = { x, z };
+    this.idleLookBias = 0;
+    this.lazyHopTimer = rand(6.5, 11.5);
+    this._pickNewLazyTarget();
+
+    this.chaseCandy = null;
+    this.curAiState = 'P6';
+    this.tailBend = 0;
+    this.tailBendVel = 0;
+    this.headTiltX = 0;
+    this.headTiltY = 0;
+
+    this._buildModel(flavor);
+    this.updateVisuals(0.016, 0, 0);
+  }
+
+  get colRadius(){
+    return BODY_RADIUS * this.sizeScale;
+  }
+
+  get floorRestY(){
+    return TRAY_FLOOR_Y;
+  }
+
+  _makeJellyMat(hexColor, deepColor, opacity = 0.94){
+    return new THREE.MeshPhysicalMaterial({
+      color: hexColor,
+      emissive: new THREE.Color(hexColor).multiplyScalar(0.06),
+      roughness: 0.12,
+      metalness: 0.0,
+      transmission: 0.14,
+      thickness: 1.45,
+      ior: 1.42,
+      attenuationColor: new THREE.Color(deepColor),
+      attenuationDistance: 1.35,
+      clearcoat: 1.0,
+      clearcoatRoughness: 0.06,
+      sheen: 0.25,
+      sheenRoughness: 0.35,
+      sheenColor: new THREE.Color(0xffffff),
+      transparent: true,
+      opacity,
+    });
+  }
+
+  _buildModel(flavor){
+    this.root = new THREE.Group();
+    this.root.rotation.order = 'YXZ'; // 保证 yaw -> pitch -> roll 绝不发生万向锁
+
+    this.stretchOuter = new THREE.Group();
+    this.stretchInner = new THREE.Group();
+    this.bodyPivot = new THREE.Group();
+    this.root.add(this.stretchOuter);
+    this.stretchOuter.add(this.stretchInner);
+    this.stretchInner.add(this.bodyPivot);
+    this.bodyPivot.scale.setScalar(MODEL_BASE_SCALE);
+
+    this.headMat = this._makeJellyMat(flavor.color, flavor.deep, 0.95);
+    this.torsoMat = this._makeJellyMat(flavor.color, flavor.deep, 0.94);
+    this.tailMat = this._makeJellyMat(flavor.color, flavor.deep, 0.90);
+    this.gillMat = this._makeJellyMat(flavor.gill, flavor.gillDeep, 0.96);
+    this.coreMat = new THREE.MeshPhysicalMaterial({
+      color: 0xffffff,
+      emissive: new THREE.Color(flavor.color),
+      emissiveIntensity: 0.48,
+      roughness: 0.18,
+      transparent: true,
+      opacity: 0.78,
+    });
+    this.eyeMat = new THREE.MeshStandardMaterial({ color: 0x221b18, roughness: 0.12 });
+    this.specMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    this.blushMat = new THREE.MeshBasicMaterial({ color: 0xff6e96, transparent: true, opacity: 0.42 });
+    this.smileMat = new THREE.MeshStandardMaterial({ color: 0x3b2622, roughness: 0.35 });
+
+    this.pickMeshes = [];
+    const registerPick = (mesh, partTag, castShadow = true) => {
+      mesh.userData.pet = this;
+      mesh.userData.partTag = partTag;
+      mesh.castShadow = castShadow;
+      this.pickMeshes.push(mesh);
+      return mesh;
+    };
+
+    // 1. 躯干与内部发光糖芯
+    this.torsoMesh = registerPick(new THREE.Mesh(sharedGeos.torso, this.torsoMat), 'body');
+    this.torsoMesh.position.set(0, 0.34, -0.05);
+    this.bodyPivot.add(this.torsoMesh);
+
+    this.coreCandy = new THREE.Mesh(sharedGeos.coreCandy, this.coreMat);
+    this.coreCandy.position.set(0, 0.35, -0.04);
+    this.bodyPivot.add(this.coreCandy);
+
+    // 2. 头部组（圆润头、高光眼、腮红、微笑嘴、唱歌小圆嘴、左右 3 支羽毛外鳃）
+    this.headGroup = new THREE.Group();
+    this.headGroup.position.set(0, 0.42, 0.36);
+    this.bodyPivot.add(this.headGroup);
+
+    const headMesh = registerPick(new THREE.Mesh(sharedGeos.head, this.headMat), 'head');
+    this.headGroup.add(headMesh);
+
+    this.eyeMeshes = [];
+    for (const side of [-1, 1]){
+      const eye = new THREE.Mesh(sharedGeos.eye, this.eyeMat);
+      eye.position.set(side * 0.21, 0.05, 0.34);
+      this.headGroup.add(eye);
+      this.eyeMeshes.push(eye);
+
+      const spec = new THREE.Mesh(sharedGeos.eyeSpec, this.specMat);
+      spec.position.set(side * 0.195, 0.072, 0.388);
+      this.headGroup.add(spec);
+
+      const blush = new THREE.Mesh(sharedGeos.blush, this.blushMat);
+      blush.position.set(side * 0.27, -0.04, 0.28);
+      this.headGroup.add(blush);
+    }
+
+    const smileMesh = new THREE.Mesh(sharedGeos.smile, this.smileMat);
+    smileMesh.position.set(0, -0.03, 0.385);
+    smileMesh.rotation.z = Math.PI + 0.24;
+    this.headGroup.add(smileMesh);
+    this.smileMesh = smileMesh;
+
+    // 唱歌小圆嘴（复用 this.smileMat，免额外销毁）
+    this.singMouth = new THREE.Mesh(sharedGeos.singMouth, this.smileMat);
+    this.singMouth.position.set(0, -0.055, 0.392);
+    this.singMouth.scale.set(0.95, 1.15, 0.75);
+    this.singMouth.visible = false;
+    this.headGroup.add(this.singMouth);
+
+    this.gillGroups = [];
+    for (const side of [-1, 1]){
+      const gHolder = new THREE.Group();
+      gHolder.position.set(side * 0.38, 0.04, 0.02);
+      this.headGroup.add(gHolder);
+      this.gillGroups.push({ group: gHolder, side });
+
+      const angles = [0.42, 0.02, -0.38];
+      for (let k = 0; k < 3; k++){
+        const branch = new THREE.Group();
+        branch.rotation.z = side * (Math.PI * 0.5 - 0.18) + angles[k] * side;
+        branch.rotation.y = -side * (0.28 + k * 0.12);
+        const stalk = registerPick(new THREE.Mesh(sharedGeos.gillStalk, this.gillMat), 'head');
+        stalk.position.y = 0.12;
+        branch.add(stalk);
+
+        for (let f = 0; f < 3; f++){
+          const frond = new THREE.Mesh(sharedGeos.gillFrond, this.gillMat);
+          frond.position.set((f - 1) * 0.04, 0.14 + f * 0.055, 0.02);
+          frond.scale.set(0.9, 1.15, 0.7);
+          branch.add(frond);
+        }
+        gHolder.add(branch);
+      }
+    }
+
+    // 3. 尾巴与半透明背尾鳍
+    this.tailGroup = new THREE.Group();
+    this.tailGroup.position.set(0, 0.31, -0.40);
+    this.bodyPivot.add(this.tailGroup);
+
+    const tailMesh = registerPick(new THREE.Mesh(sharedGeos.tail, this.tailMat), 'tail');
+    tailMesh.position.set(0, 0, -0.34);
+    this.tailGroup.add(tailMesh);
+
+    this.finMat = new THREE.MeshPhysicalMaterial({
+      color: flavor.gill,
+      emissive: new THREE.Color(flavor.gill).multiplyScalar(0.16),
+      roughness: 0.14,
+      transparent: true,
+      opacity: 0.74,
+      side: THREE.DoubleSide,
+    });
+    const finMesh = new THREE.Mesh(sharedGeos.fin, this.finMat);
+    finMesh.position.set(0, 0.13, -0.30);
+    finMesh.rotation.y = Math.PI / 2;
+    finMesh.rotation.x = 0.18;
+    this.tailGroup.add(finMesh);
+
+    // 4. 四只小短腿
+    this.legs = [];
+    const legCoords = [
+      [-0.27, 0.14, 0.12],
+      [0.27, 0.14, 0.12],
+      [-0.25, 0.14, -0.24],
+      [0.25, 0.14, -0.24],
+    ];
+    legCoords.forEach((p, idx) => {
+      const leg = registerPick(new THREE.Mesh(sharedGeos.leg, this.torsoMat), 'body');
+      leg.position.set(p[0], p[1], p[2]);
+      leg.rotation.z = p[0] < 0 ? 0.38 : -0.38;
+      this.bodyPivot.add(leg);
+      this.legs.push({ mesh: leg, idx, side: p[0] < 0 ? -1 : 1 });
+    });
+
+    scene.add(this.root);
+
+    // 5. 瓷盘底部彩色透光焦散光斑
+    this.decalMat = new THREE.MeshBasicMaterial({
+      map: glowTex,
+      color: flavor.color,
+      transparent: true,
+      opacity: 0.34,
+      depthWrite: false,
+    });
+    this.decal = new THREE.Mesh(sharedGeos.decal, this.decalMat);
+    this.decal.position.set(this.pos.x, TRAY_FLOOR_Y + 0.015, this.pos.z);
+    this.decal.renderOrder = -1;
+    scene.add(this.decal);
+  }
+
+  _pickNewLazyTarget(){
+    const margin = Math.max(0.75, this.colRadius + 0.32);
+    const rx = rand(-(TRAY_HALF_X - margin), TRAY_HALF_X - margin);
+    const rz = rand(-(TRAY_HALF_Z - margin), TRAY_HALF_Z - margin);
+    const cl = clampToTrayRoundedRect(rx, rz, margin);
+    this.idleTarget.x = cl.x;
+    this.idleTarget.z = cl.z;
+  }
+
+  // 头 -> 鳃 -> 躯干 -> 尾 彩虹波纹渐变换色（含深色果味吸收 attenuationColor 同步渐变）
+  startColorRipple(nextFlavor){
+    this.flavor = nextFlavor;
+    this.colorRipple = {
+      elapsed: 0,
+      duration: 0.92,
+      fromBody: this.torsoMat.color.clone(),
+      fromBodyAtten: this.torsoMat.attenuationColor.clone(),
+      fromGill: this.gillMat.color.clone(),
+      fromGillAtten: this.gillMat.attenuationColor.clone(),
+      fromDecal: this.decalMat.color.clone(),
+      toBody: new THREE.Color(nextFlavor.color),
+      toBodyAtten: new THREE.Color(nextFlavor.deep),
+      toGill: new THREE.Color(nextFlavor.gill),
+      toGillAtten: new THREE.Color(nextFlavor.gillDeep),
+    };
+  }
+
+  _updateColorRipple(dt){
+    if (!this.colorRipple) return;
+    const r = this.colorRipple;
+    r.elapsed += dt;
+    const p = clamp(r.elapsed / r.duration, 0, 1);
+
+    const tHead = clamp(p * 1.45, 0, 1);
+    const tTorso = clamp((p - 0.22) * 1.45, 0, 1);
+    const tTail = clamp((p - 0.45) * 1.45, 0, 1);
+
+    this.headMat.color.copy(r.fromBody).lerp(r.toBody, tHead);
+    this.headMat.attenuationColor.copy(r.fromBodyAtten).lerp(r.toBodyAtten, tHead);
+    this.gillMat.color.copy(r.fromGill).lerp(r.toGill, tHead);
+    this.gillMat.attenuationColor.copy(r.fromGillAtten).lerp(r.toGillAtten, tHead);
+    this.torsoMat.color.copy(r.fromBody).lerp(r.toBody, tTorso);
+    this.torsoMat.attenuationColor.copy(r.fromBodyAtten).lerp(r.toBodyAtten, tTorso);
+    this.coreMat.emissive.copy(this.torsoMat.color);
+    this.tailMat.color.copy(r.fromBody).lerp(r.toBody, tTail);
+    this.tailMat.attenuationColor.copy(r.fromBodyAtten).lerp(r.toBodyAtten, tTail);
+    this.finMat.color.copy(r.fromGill).lerp(r.toGill, tTail);
+    this.decalMat.color.copy(r.fromDecal).lerp(r.toBody, tTorso);
+
+    if (tTail >= 1){
+      this.colorRipple = null;
+    }
+  }
+
+  eatCandy(candy){
+    this.squashVel += 5.4;
+    this.eatHappyTimer = 0.95;
+    this.happyTimer = 1.25;
+    if (!zeroGravity){
+      this.vel.y = Math.max(this.vel.y, 2.8);
+      this.onFloor = false;
+    }
+
+    if (candy.type === 'rainbow'){
+      const candidates = FLAVORS.filter(f => f.id !== this.flavor.id);
+      const nextFlavor = candidates[(Math.random() * candidates.length) | 0];
+      const oldName = this.flavor.name;
+      this.startColorRipple(nextFlavor);
+      sfx.playHappyArpeggio(nextFlavor.freq, this.sizeScale);
+      showToast(`🌈 ${oldName}吃下彩虹糖，波纹变身成「${nextFlavor.name}」！`);
+    } else if (candy.type === 'fizz'){
+      this.fizzTimer = 5.0;
+      this.fizzPulseTimer = 0.0;
+      this.chaseCandy = null;
+      sfx.playHappyArpeggio(this.flavor.freq * 1.15, this.sizeScale);
+      showToast(`⚡ ${this.flavor.name}吃下跳跳气泡糖，糖分飙升啦！`);
+    } else if (candy.type === 'size'){
+      if (this.targetSizeScale > 1.15){
+        this.targetSizeScale = 0.72;
+        showToast(`⭐ ${this.flavor.name}变成了袖珍口袋软糖！`);
+      } else if (this.targetSizeScale < 0.88){
+        this.targetSizeScale = 1.0;
+        showToast(`⭐ ${this.flavor.name}恢复了标准身材！`);
+      } else {
+        this.targetSizeScale = 1.36;
+        showToast(`⭐ ${this.flavor.name}膨胀成巨无霸软糖啦！`);
+      }
+      sfx.playChime(this.flavor.freq, this.targetSizeScale, 0.13);
+    } else {
+      this.coreMat.emissive.setHex(candy.color);
+      sfx.playNom(this.sizeScale);
+    }
+  }
+
+  // V3 原味轻抚撸一撸：眯眼 + 腮红 + 旋转小跳 + 几何爱心 + 五声琶音（绝不出现音符）
+  triggerRubHappy(){
+    this.rubEnergy = 0;
+    this.rubCooldown = 3.2;
+    this.rubHappyTimer = 0.95;
+    this.happyTimer = 1.4;
+    this.chaseCandy = null;
+    this.squashVel += 6.2;
+    this.yawVel += (Math.random() > 0.5 ? 1 : -1) * 5.8;
+    if (!zeroGravity){
+      this.vel.y = Math.max(this.vel.y, 3.6);
+      this.onFloor = false;
+    } else {
+      this.vel.y += 1.4;
+    }
+    spawnHeartBurst(this.pos.x, this.pos.y + 0.55 * this.sizeScale, this.pos.z, 4);
+    sfx.playHappyArpeggio(this.flavor.freq, this.sizeScale);
+    showToast(`${this.flavor.name}被撸得眯起眼睛啦 ♡`);
+  }
+
+  triggerHop(strength = 1.0){
+    this.singPulse = 1.0;
+    if (!this.isGrabbed){
+      spawnMusicNoteSprite(this.pos.x, this.pos.y, this.pos.z, this.flavor.uiHex, this.sizeScale);
+    }
+    if (zeroGravity){
+      this.vel.y += 2.0 * strength;
+      this.yawVel += rand(-2.8, 2.8);
+    } else {
+      this.vel.y = Math.max(this.vel.y, 4.4 * strength / Math.sqrt(this.sizeScale));
+      this.onFloor = false;
+    }
+    this.squashVel += 6.8 * strength;
+    this.happyTimer = 1.1;
+  }
+
+  scheduleSing(delaySec, accent = 1.0){
+    if (delaySec <= 0.001){
+      this.triggerSing(accent);
+    } else {
+      this.pendingSingTimer = delaySec;
+      this.pendingSingAccent = accent;
+    }
+  }
+
+  triggerSing(accent = 1.0){
+    this.singPulse = 1.0;
+    this.musicBounceTimer = 0.42;
+    this.squashVel += 3.8 * accent;
+
+    if (!this.isGrabbed){
+      spawnMusicNoteSprite(this.pos.x, this.pos.y, this.pos.z, this.flavor.uiHex, this.sizeScale);
+    }
+
+    const canChorusMove = !this.isGrabbed && this.fizzTimer <= 0 && this.rubHappyTimer <= 0 &&
+      this.curAiState !== 'P4' && this.curAiState !== 'P5';
+
+    if (canChorusMove){
+      if (!zeroGravity){
+        if (this.onFloor){
+          this.vel.y = Math.max(this.vel.y, 2.85 / Math.sqrt(this.sizeScale));
+          this.onFloor = false;
+        }
+        const toCamYaw = Math.atan2(camera.position.x - this.pos.x, camera.position.z - this.pos.z);
+        this.yaw += angleDiff(this.yaw, toCamYaw) * 0.24;
+      } else {
+        const spinDir = (this.uid % 2 === 0 ? 1 : -1) * (Math.random() < 0.7 ? 1 : -1);
+        this.yawVel += spinDir * 2.5;
+        if (this.pos.y < ZERO_G_CEILING_Y - 1.05){
+          this.vel.y += 0.95;
+        }
+        this.floatY = clamp(this.pos.y + 0.12, TRAY_FLOOR_Y + 0.55, ZERO_G_CEILING_Y - 0.85);
+      }
+    }
+  }
+
+  stepRenderTimers(dt){
+    if (this.pendingSingTimer >= 0){
+      this.pendingSingTimer -= dt;
+      if (this.pendingSingTimer <= 0){
+        this.pendingSingTimer = -1;
+        this.triggerSing(this.pendingSingAccent);
+      }
+    }
+    if (this.singPulse > 0) this.singPulse = Math.max(0, this.singPulse - dt / 0.38);
+    if (this.musicBounceTimer > 0) this.musicBounceTimer = Math.max(0, this.musicBounceTimer - dt);
+    if (this.nodPulse > 0) this.nodPulse = Math.max(0, this.nodPulse - dt / 0.32);
+  }
+
+  stepPhysics(dt, elapsed, grabTarget){
+    this.sizeScale = lerp(this.sizeScale, this.targetSizeScale, clamp(dt * 5.2, 0, 1));
+    const restY = this.floorRestY;
+    const radius = this.colRadius;
+
+    if (this.rubCooldown > 0) this.rubCooldown = Math.max(0, this.rubCooldown - dt);
+    if (this.rubEnergy > 0) this.rubEnergy = Math.max(0, this.rubEnergy - dt * 95);
+    if (this.fizzTimer > 0) this.fizzTimer = Math.max(0, this.fizzTimer - dt);
+    if (this.rubHappyTimer > 0) this.rubHappyTimer = Math.max(0, this.rubHappyTimer - dt);
+    if (this.happyTimer > 0) this.happyTimer = Math.max(0, this.happyTimer - dt);
+    if (this.eatHappyTimer > 0) this.eatHappyTimer = Math.max(0, this.eatHappyTimer - dt);
+
+    // =====================================================================
+    // 严格单轨 AI 优先级状态机：P1 > P2 > P3 > P4 > P5 > P5.5 > P6
+    // =====================================================================
+    let state = 'P6';
+    if (this.isGrabbed && grabTarget){
+      state = 'P1';
+    } else if (this.fizzTimer > 0){
+      state = 'P2';
+    } else if (this.rubHappyTimer > 0){
+      state = 'P3';
+    } else if (this.chaseCandy){
+      state = 'P4';
+    } else if (fireflyMode && fireflyState.active){
+      state = 'P5';
+    } else if (musicBox.playing && (this.singPulse > 0.05 || this.musicBounceTimer > 0)){
+      state = 'P5.5';
+    }
+    this.curAiState = state;
+
+    let overridePitch = null;
+    let isLazyStrolling = false;
+    let lazyStrollSpd = 0;
+
+    if (state === 'P1'){
+      // --- P1: 玩家抓取拉扯 ---
+      this.chaseCandy = null;
+      this.rubEnergy = 0;
+
+      const dx = safeNum(grabTarget.x - this.pos.x);
+      const dy = safeNum(grabTarget.y - this.pos.y);
+      const dz = safeNum(grabTarget.z - this.pos.z);
+
+      const followRate = 13.5;
+      this.vel.x = lerp(this.vel.x, dx * followRate, clamp(dt * 14, 0, 1));
+      this.vel.y = lerp(this.vel.y, dy * followRate, clamp(dt * 14, 0, 1));
+      this.vel.z = lerp(this.vel.z, dz * followRate, clamp(dt * 14, 0, 1));
+
+      this.pos.x += this.vel.x * dt;
+      this.pos.y += this.vel.y * dt;
+      this.pos.z += this.vel.z * dt;
+
+      const worldPullX = dx * 0.94;
+      const worldPullY = dy * 0.94 + (zeroGravity ? 0.04 : 0.16);
+      const worldPullZ = dz * 0.94;
+      const c = Math.cos(-this.yaw), s = Math.sin(-this.yaw);
+      const locX = worldPullX * c + worldPullZ * s;
+      const locZ = -worldPullX * s + worldPullZ * c;
+      const locY = worldPullY;
+
+      const rawLen = Math.hypot(locX, locY, locZ);
+      const maxStretch = 1.18;
+      const clampedLen = rawLen > 1e-4 ? maxStretch * Math.tanh(rawLen / maxStretch) : 0;
+      const scaleF = rawLen > 1e-4 ? clampedLen / rawLen : 0;
+
+      this.pullVec.x = lerp(this.pullVec.x, locX * scaleF, clamp(dt * 16, 0, 1));
+      this.pullVec.y = lerp(this.pullVec.y, locY * scaleF, clamp(dt * 16, 0, 1));
+      this.pullVec.z = lerp(this.pullVec.z, locZ * scaleF, clamp(dt * 16, 0, 1));
+      this.pullVel.set(0, 0, 0);
+
+      if (this.squishAmt > 0.02){
+        this.squashVel -= this.squishAmt * 28 * dt;
+      }
+
+      this.yawVel = lerp(this.yawVel, clamp(-locX * 1.4, -2.5, 2.5), dt * 5);
+      this.yaw += this.yawVel * dt;
+      this.onFloor = false;
+    } else {
+      if (state === 'P2'){
+        // --- P2: 跳跳糖狂欢 ---
+        this.chaseCandy = null;
+        this.fizzPulseTimer -= dt;
+        if (this.fizzPulseTimer <= 0){
+          this.fizzPulseTimer = 0.44;
+          const ang = Math.random() * TAU;
+          const spd = zeroGravity ? rand(3.2, 5.2) : rand(4.2, 6.6);
+          this.vel.x = Math.sin(ang) * spd;
+          this.vel.z = Math.cos(ang) * spd;
+          this.vel.y = zeroGravity ? rand(-2.2, 2.6) : rand(3.8, 5.6);
+          this.yawVel = rand(-6.0, 6.0);
+          this.squashVel += 7.2;
+          this.onFloor = false;
+          spawnJellyParticles(this.pos.x, this.pos.y + 0.35, this.pos.z, this.flavor.color, 3, zeroGravity ? 0.12 : 1.0);
+          sfx.playFizzPop();
+        }
+      } else if (state === 'P3'){
+        // --- P3: V3 被撸开心定格旋转 ---
+        this.chaseCandy = null;
+        this.yawVel = lerp(this.yawVel, 4.2, clamp(dt * 6, 0, 1));
+      } else if (state === 'P4' && this.chaseCandy){
+        // --- P4: 追吃魔法糖豆（地面 / 失重真 3D） ---
+        const cPos = this.chaseCandy.pos;
+        const dx = cPos.x - this.pos.x;
+        const dy = cPos.y - (this.pos.y + 0.25 * this.sizeScale);
+        const dz = cPos.z - this.pos.z;
+        const distXZ = Math.hypot(dx, dz);
+        const desiredYaw = Math.atan2(dx, dz);
+        this.yaw += clamp(angleDiff(this.yaw, desiredYaw), -6.8 * dt, 6.8 * dt);
+
+        if (zeroGravity){
+          const dist3 = Math.hypot(dx, dy, dz) || 1;
+          const swimThrust = 9.2;
+          this.vel.x += (dx / dist3) * swimThrust * dt;
+          this.vel.y += (dy / dist3) * swimThrust * dt;
+          this.vel.z += (dz / dist3) * swimThrust * dt;
+          overridePitch = clamp(-Math.atan2(dy, Math.max(0.35, distXZ)), -0.78, 0.78);
+        } else if (this.onFloor && distXZ > 0.55){
+          const hopSpd = clamp(distXZ * 1.45, 2.3, 4.8);
+          this.vel.x = Math.sin(this.yaw) * hopSpd;
+          this.vel.z = Math.cos(this.yaw) * hopSpd;
+          this.vel.y = 2.65;
+          this.squashVel += 4.2;
+          this.onFloor = false;
+        }
+      } else if (state === 'P5'){
+        // --- P5: 萤火追光（地面平面围观 vs 失重真 3D 全向球形围观 + 俯仰游姿） ---
+        const fPos = fireflyState.pos;
+        if (zeroGravity){
+          const orbitR = 1.05 * this.sizeScale + 0.25;
+          const rawGx = fPos.x + this.swarmOffset.x * orbitR;
+          const rawGy = fPos.y + this.swarmOffset.y * orbitR;
+          const rawGz = fPos.z + this.swarmOffset.z * orbitR;
+
+          const clampedG = clampToTrayRoundedRect(rawGx, rawGz, radius + 0.15);
+          const goalY = clamp(rawGy, TRAY_FLOOR_Y + 0.35, ZERO_G_CEILING_Y - 0.85 * this.sizeScale);
+
+          const dx = clampedG.x - this.pos.x;
+          const dy = goalY - this.pos.y;
+          const dz = clampedG.z - this.pos.z;
+          const dist3 = Math.hypot(dx, dy, dz);
+
+          const lookDx = dist3 < 0.55 ? (fPos.x - this.pos.x) : dx;
+          const lookDy = dist3 < 0.55 ? (fPos.y - this.pos.y) : dy;
+          const lookDz = dist3 < 0.55 ? (fPos.z - this.pos.z) : dz;
+          const lookHoriz = Math.hypot(lookDx, lookDz);
+
+          if (lookHoriz > 0.04){
+            const desiredYaw = Math.atan2(lookDx, lookDz);
+            this.yaw += clamp(angleDiff(this.yaw, desiredYaw), -6.5 * dt, 6.5 * dt);
+          }
+          overridePitch = clamp(-Math.atan2(lookDy, Math.max(0.35, lookHoriz)), -0.82, 0.82);
+
+          if (dist3 >= 0.45){
+            const inv3 = 1 / dist3;
+            const thrust = clamp(dist3 * 4.2, 2.2, 7.6) / Math.pow(this.sizeScale, 0.2);
+            this.vel.x += dx * inv3 * thrust * dt;
+            this.vel.y += dy * inv3 * thrust * dt;
+            this.vel.z += dz * inv3 * thrust * dt;
+          } else {
+            const hoverDamp = Math.pow(0.88, dt * 60);
+            this.vel.x *= hoverDamp;
+            this.vel.y *= hoverDamp;
+            this.vel.z *= hoverDamp;
+          }
+        } else {
+          const dx = fPos.x - this.pos.x;
+          const dz = fPos.z - this.pos.z;
+          const distXZ = Math.hypot(dx, dz);
+          const desiredYaw = Math.atan2(dx, dz);
+          this.yaw += clamp(angleDiff(this.yaw, desiredYaw), -6.2 * dt, 6.2 * dt);
+
+          const stopDist = 1.05 * this.sizeScale + 0.22;
+          if (this.onFloor){
+            this.lazyHopTimer -= dt * 2.2;
+            if (distXZ > stopDist){
+              const hopSpd = clamp((distXZ - stopDist * 0.7) * 1.35, 1.8, 4.1);
+              this.vel.x = Math.sin(this.yaw) * hopSpd;
+              this.vel.z = Math.cos(this.yaw) * hopSpd;
+              this.vel.y = 2.35;
+              this.squashVel += 3.6;
+              this.onFloor = false;
+            } else if (this.lazyHopTimer <= 0){
+              this.vel.y = 1.85;
+              this.squashVel += 3.0;
+              this.onFloor = false;
+              this.lazyHopTimer = rand(0.95, 1.85);
+            }
+          }
+        }
+      } else if (state === 'P5.5'){
+        // --- P5.5: 乐团节拍唱跳期间保持队形 ---
+        if (!zeroGravity){
+          this.vel.x *= Math.pow(0.88, dt * 60);
+          this.vel.z *= Math.pow(0.88, dt * 60);
+        }
+      } else {
+        // --- P6: B. 慵懒惬意型自主活体生态 ---
+        const beingPetted = (this.rubEnergy > 12) || (!fireflyMode && hoverAx === this);
+        if (beingPetted){
+          this.idleMode = 'rest';
+          this.idleLookBias = lerp(this.idleLookBias, 0, clamp(dt * 4, 0, 1));
+        } else if (zeroGravity){
+          // 失重态：全舱缓慢巡游 + 柔和浮沉
+          this.idleModeTimer -= dt;
+          if (this.idleModeTimer <= 0){
+            this.idleModeTimer = rand(3.8, 7.0);
+            this._pickNewLazyTarget();
+            this.floatY = rand(1.15, ZERO_G_CEILING_Y - 1.15 * this.sizeScale);
+          }
+          const dx = this.idleTarget.x - this.pos.x;
+          const dz = this.idleTarget.z - this.pos.z;
+          const dist = Math.hypot(dx, dz);
+          if (dist > 0.55){
+            const desiredYaw = Math.atan2(dx, dz);
+            this.yaw += clamp(angleDiff(this.yaw, desiredYaw), -2.2 * dt, 2.2 * dt);
+            const cruiseSpd = 0.52;
+            this.vel.x = lerp(this.vel.x, Math.sin(this.yaw) * cruiseSpd, clamp(dt * 2.2, 0, 1));
+            this.vel.z = lerp(this.vel.z, Math.cos(this.yaw) * cruiseSpd, clamp(dt * 2.2, 0, 1));
+          }
+        } else if (this.onFloor){
+          // 地面态：惬意歇息 (rest) ⇄ 慢悠悠踱步 (stroll)
+          this.idleModeTimer -= dt;
+          if (this.idleModeTimer <= 0){
+            if (this.idleMode === 'rest'){
+              // 音乐盒播放时更倾向原地伴舞，减少远走欲望
+              const wantStroll = musicBox.playing ? (Math.random() < 0.35) : (Math.random() < 0.72);
+              if (wantStroll){
+                this.idleMode = 'stroll';
+                this.idleModeTimer = rand(2.4, 4.4);
+                this._pickNewLazyTarget();
+              } else {
+                this.idleModeTimer = rand(3.5, 6.2);
+                this.idleLookBias = rand(-0.34, 0.34);
+              }
+            } else {
+              this.idleMode = 'rest';
+              this.idleModeTimer = rand(3.8, 6.8);
+              this.idleLookBias = rand(-0.28, 0.28);
+            }
+          }
+
+          if (this.idleMode === 'stroll'){
+            const dx = this.idleTarget.x - this.pos.x;
+            const dz = this.idleTarget.z - this.pos.z;
+            const dist = Math.hypot(dx, dz);
+            if (dist < 0.42){
+              this.idleMode = 'rest';
+              this.idleModeTimer = rand(3.6, 6.5);
+              this.idleLookBias = rand(-0.26, 0.26);
+            } else {
+              const desiredYaw = Math.atan2(dx, dz);
+              this.yaw += clamp(angleDiff(this.yaw, desiredYaw), -2.4 * dt, 2.4 * dt);
+              isLazyStrolling = true;
+              lazyStrollSpd = 0.82 / Math.sqrt(this.sizeScale);
+              this.idleLookBias = lerp(this.idleLookBias, 0, clamp(dt * 3, 0, 1));
+            }
+          } else {
+            // 歇息态低频偶发原地惬意轻跳
+            this.lazyHopTimer -= dt;
+            if (this.lazyHopTimer <= 0){
+              if (Math.random() < 0.35 && wobble > 0.08 && !musicBox.playing){
+                this.vel.y = (1.5 + Math.random() * 1.4) * Math.min(1.25, 0.5 + wobble * 0.5);
+                this.squashVel += 3.8;
+                this.onFloor = false;
+              }
+              this.lazyHopTimer = rand(7.0, 12.0);
+            }
+          }
+        }
+      }
+
+      // 物理积分（地面重力 vs 失重悬浮弹簧解耦）
+      if (zeroGravity){
+        const disableFloatSpring = (state === 'P2' || state === 'P4' || state === 'P5');
+        const floatK = disableFloatSpring ? 0 : 2.45;
+        if (floatK > 0){
+          const targetFloatY = clamp(
+            this.floatY + Math.sin(elapsed * 1.45 + this.phase) * 0.24,
+            restY + 0.32,
+            ZERO_G_CEILING_Y - 0.92 * this.sizeScale
+          );
+          this.vel.y += (targetFloatY - this.pos.y) * floatK * dt;
+        }
+
+        const spaceDamp = Math.pow(0.958, dt * 60);
+        this.vel.x *= spaceDamp;
+        this.vel.y *= spaceDamp;
+        this.vel.z *= spaceDamp;
+        this.yawVel += Math.sin(elapsed * 0.8 + this.phase) * 0.16 * dt;
+        this.yawVel *= Math.pow(0.96, dt * 60);
+      } else {
+        this.vel.y -= GRAVITY * dt;
+        const airDamp = Math.pow(0.92, dt * 60);
+        this.vel.x *= airDamp;
+        this.vel.z *= airDamp;
+        this.yawVel *= Math.pow(0.92, dt * 60);
+      }
+
+      const maxSpd = zeroGravity ? 11.5 : 26;
+      const spd = Math.hypot(this.vel.x, this.vel.y, this.vel.z);
+      if (spd > maxSpd){
+        const sc = maxSpd / spd;
+        this.vel.x *= sc; this.vel.y *= sc; this.vel.z *= sc;
+      }
+
+      this.pos.x += this.vel.x * dt;
+      this.pos.y += this.vel.y * dt;
+      this.pos.z += this.vel.z * dt;
+      this.yaw += this.yawVel * dt;
+
+      // 松手后 3D 拉扯弹簧回弹
+      const pullStiff = 128;
+      const pullDamp = lerp(9.0, 4.4, clamp(wobble / 2, 0, 1));
+      this.pullVel.x += (-pullStiff * this.pullVec.x - pullDamp * this.pullVel.x) * dt;
+      this.pullVel.y += (-pullStiff * this.pullVec.y - pullDamp * this.pullVel.y) * dt;
+      this.pullVel.z += (-pullStiff * this.pullVec.z - pullDamp * this.pullVel.z) * dt;
+      this.pullVec.addScaledVector(this.pullVel, dt);
+      if (this.pullVec.lengthSq() < 1e-6 && this.pullVel.lengthSq() < 1e-6){
+        this.pullVec.set(0, 0, 0);
+        this.pullVel.set(0, 0, 0);
+      }
+      this.squishAmt = lerp(this.squishAmt, 0, dt * 10);
+    }
+
+    // 3. 陶瓷盘底与失重隐形顶棚限位（保留 V3 落盘弹跳与五声音阶音效）
+    const floorLimit = zeroGravity ? (restY + 0.14) : restY;
+    if (this.pos.y <= floorLimit){
+      const impact = -this.vel.y;
+      this.pos.y = floorLimit;
+      if (zeroGravity){
+        if (this.vel.y < 0) this.vel.y = -this.vel.y * 0.45;
+        this.onFloor = false;
+      } else if (impact > 1.3){
+        const restitution = 0.36 + 0.14 * clamp(wobble, 0, 1.5);
+        this.vel.y = impact * restitution;
+        this.squashVel -= clamp(impact * 1.55, 2.0, 14.5);
+        this.onFloor = false;
+        if (impact > 4.0){
+          spawnJellyParticles(this.pos.x, TRAY_FLOOR_Y + 0.12, this.pos.z, this.flavor.color, 5);
+        }
+        if (impact > 3.0 && elapsed - this.lastLandSound > 0.18){
+          this.lastLandSound = elapsed;
+          sfx.playBoing(0.88 + Math.random() * 0.25, clamp(impact * 0.013, 0.04, 0.14), this.sizeScale);
+          if (impact > 6.2){
+            sfx.playChime(this.flavor.freq, this.sizeScale, 0.075);
+          }
+        }
+      } else {
+        this.vel.y = 0;
+        this.onFloor = true;
+      }
+      if (!zeroGravity){
+        const fric = Math.pow(0.84, dt * 60);
+        this.vel.x *= fric;
+        this.vel.z *= fric;
+        // 摩擦之后应用慵懒慢踱步（短腿划步配合，绝不滑冰）
+        if (isLazyStrolling && this.onFloor){
+          const targetVx = Math.sin(this.yaw) * lazyStrollSpd;
+          const targetVz = Math.cos(this.yaw) * lazyStrollSpd;
+          this.vel.x = lerp(this.vel.x, targetVx, clamp(dt * 8, 0, 1));
+          this.vel.z = lerp(this.vel.z, targetVz, clamp(dt * 8, 0, 1));
+        }
+      }
+    } else {
+      this.onFloor = false;
+    }
+
+    const ceilLimit = zeroGravity ? (ZERO_G_CEILING_Y - 0.82 * this.sizeScale) : 9.5;
+    if (this.pos.y > ceilLimit){
+      this.pos.y = ceilLimit;
+      if (this.vel.y > 0) this.vel.y *= -0.42;
+    }
+
+    // 退出追光或吃完糖后同步 floatY，防止突兀回弹
+    if (zeroGravity && !this.isGrabbed && (state === 'P2' || state === 'P4' || state === 'P5')){
+      this.floatY = clamp(this.pos.y, restY + 0.25, ceilLimit - 0.15);
+    }
+
+    // 4. V4 立体陶瓷盘沿内壁动态半径反弹（防止 P6 慵懒踱步蹭墙）
+    const clamped = clampToTrayRoundedRect(this.pos.x, this.pos.z, radius);
+    if (clamped.hit){
+      this.pos.x = clamped.x;
+      this.pos.z = clamped.z;
+      const vn = this.vel.x * clamped.nx + this.vel.z * clamped.nz;
+      if (vn < 0){
+        const bounce = -vn * 1.45;
+        this.vel.x += clamped.nx * bounce;
+        this.vel.z += clamped.nz * bounce;
+        this.squashVel -= clamp(-vn * 0.72, 1.0, 6.5);
+        if (-vn > 3.5){
+          spawnJellyParticles(this.pos.x, this.pos.y + 0.3, this.pos.z, this.flavor.color, 4);
+        }
+      }
+      if (state === 'P6' && this.idleMode === 'stroll'){
+        this.idleMode = 'rest';
+        this.idleModeTimer = rand(3.5, 6.2);
+      }
+    }
+
+    // 5. 垂直挤压弹簧步进
+    const fizzJitter = this.fizzTimer > 0 ? Math.sin(elapsed * 32 + this.phase) * 0.10 : 0;
+    const strollBob = isLazyStrolling ? Math.abs(Math.sin(elapsed * 6.5 + this.phase)) * 0.025 : 0;
+    const idleJiggle = Math.sin(elapsed * 3.1 + this.phase) * 0.018 * wobble + fizzJitter + strollBob;
+    const sqStiff = 115;
+    const sqDamp = lerp(9.2, 4.2, clamp(wobble / 2, 0, 1));
+    const targetSq = -clamp(this.squishAmt * 0.22, 0, 0.62) + idleJiggle;
+    const sqAcc = -sqStiff * (this.squashPos - targetSq) - sqDamp * this.squashVel;
+    this.squashVel += sqAcc * dt;
+    this.squashPos += this.squashVel * dt;
+    this.squashPos = clamp(this.squashPos, -0.58, 0.62);
+
+    // 6. 俯仰侧倾与甩尾惯性（失重 3D 追光/追糖时直接采用 overridePitch，不被覆盖）
+    const c = Math.cos(-this.yaw), s = Math.sin(-this.yaw);
+    const locVelX = this.vel.x * c + this.vel.z * s;
+    const locVelZ = -this.vel.x * s + this.vel.z * c;
+
+    const spaceTilt = zeroGravity ? Math.sin(elapsed * 1.2 + this.phase) * 0.14 : 0;
+    const spaceRoll = zeroGravity ? Math.cos(elapsed * 1.0 + this.phase) * 0.13 : 0;
+    const targetPitch = (overridePitch !== null)
+      ? overridePitch
+      : clamp(-this.vel.y * 0.045 + locVelZ * 0.02 + spaceTilt, -0.52, 0.52);
+
+    this.pitch = lerp(this.pitch, targetPitch, clamp(dt * 8.0, 0, 1));
+    this.roll = lerp(this.roll, clamp(-locVelX * 0.055 + spaceRoll, -0.48, 0.48), clamp(dt * 8.0, 0, 1));
+
+    const tailTarget = clamp(-locVelX * 0.14 - this.yawVel * 0.25, -0.65, 0.65);
+    this.tailBendVel += (-72 * (this.tailBend - tailTarget) - 6.5 * this.tailBendVel) * dt;
+    this.tailBend += this.tailBendVel * dt;
+
+    // 自然眨眼更新
+    if (this.blinkDur > 0){
+      this.blinkDur = Math.max(0, this.blinkDur - dt);
+    } else {
+      this.blinkTimer -= dt;
+      if (this.blinkTimer <= 0){
+        this.blinkDur = 0.16;
+        this.blinkTimer = rand(2.4, 5.8);
+      }
+    }
+
+    this.currentStrain = Math.max(this.pullVec.length() * 0.72, Math.abs(this.squashPos) * 0.95);
+
+    if (!Number.isFinite(this.pos.x) || !Number.isFinite(this.pos.y) || !Number.isFinite(this.pos.z)){
+      this.pos.x = 0; this.pos.y = restY + 0.5; this.pos.z = 0;
+      this.vel.x = 0; this.vel.y = 0; this.vel.z = 0;
+      this.pullVec.set(0, 0, 0); this.pullVel.set(0, 0, 0);
+    }
+  }
+
+  updateVisuals(dt, elapsed, beatPhase){
+    // 1. 先执行头 -> 鳃 -> 躯干 -> 尾彩虹波纹变色
+    this._updateColorRipple(dt);
+
+    // 2. 在 _updateColorRipple 之后统一叠加自发光系数（与彩虹波纹变色零冲突）
+    const bodyEm = 0.06 + this.singPulse * 0.26;
+    const gillEm = 0.10 + this.singPulse * 0.26;
+    this.headMat.emissive.copy(this.headMat.color).multiplyScalar(bodyEm);
+    this.torsoMat.emissive.copy(this.torsoMat.color).multiplyScalar(bodyEm);
+    this.tailMat.emissive.copy(this.tailMat.color).multiplyScalar(bodyEm);
+    this.gillMat.emissive.copy(this.gillMat.color).multiplyScalar(gillEm);
+    this.finMat.emissive.copy(this.finMat.color).multiplyScalar(gillEm);
+
+    // 3. 唱歌小圆嘴与微笑嘴切换
+    const isSingingMouth = this.singPulse > 0.25;
+    this.smileMesh.visible = !isSingingMouth;
+    this.singMouth.visible = isSingingMouth;
+    if (isSingingMouth){
+      const mScale = 0.65 + this.singPulse * 0.68;
+      this.singMouth.scale.set(0.95 * mScale, 1.15 * mScale, 0.75);
+    }
+
+    // 4. 变换与 V3 3D 体积守恒拉伸容器更新
+    const singJiggle = this.singPulse * 0.075 * Math.sin(this.singPulse * Math.PI * 3);
+    const sy = clamp(1 + this.squashPos * 0.46 + singJiggle, 0.54, 1.48);
+    const sxz = 1 / Math.sqrt(sy);
+
+    this.root.position.set(this.pos.x, this.pos.y, this.pos.z);
+    this.root.rotation.set(this.pitch, this.yaw, this.roll, 'YXZ');
+
+    const pullLen = this.pullVec.length();
+    if (pullLen > 0.002){
+      _v1.copy(this.pullVec).divideScalar(pullLen);
+      _qPull.setFromUnitVectors(_upVec, _v1);
+      _qInv.copy(_qPull).invert();
+
+      const stretchAxis = 1 + clamp(pullLen * 0.58, 0, 0.80);
+      const shrinkCross = 1 / Math.sqrt(stretchAxis);
+
+      this.stretchOuter.quaternion.copy(_qPull);
+      this.stretchOuter.scale.set(shrinkCross, stretchAxis, shrinkCross);
+      this.stretchInner.quaternion.copy(_qInv);
+    } else {
+      this.stretchOuter.quaternion.identity();
+      this.stretchOuter.scale.set(1, 1, 1);
+      this.stretchInner.quaternion.identity();
+    }
+
+    const sc = MODEL_BASE_SCALE * this.sizeScale;
+    this.bodyPivot.scale.set(sc * sxz, sc * sy, sc * sxz);
+
+    // 5. 腮红浓淡与眯眼表情（拉扯 / 按扁 / 刚吃糖 / 被撸开心）
+    const targetBlush = (this.rubHappyTimer > 0 || this.rubEnergy > 45) ? 0.80 : 0.42;
+    this.blushMat.opacity = lerp(this.blushMat.opacity, targetBlush, clamp(dt * 8, 0, 1));
+
+    const isSquinting = (pullLen > 0.34) || (this.squishAmt > 0.45) || (this.eatHappyTimer > 0) || (this.rubHappyTimer > 0);
+    let eyeScaleY = 1.0;
+    if (isSquinting){
+      eyeScaleY = 0.22;
+    } else if (this.blinkDur > 0){
+      const phase = this.blinkDur / 0.16;
+      eyeScaleY = 1.0 - Math.sin(phase * Math.PI) * 0.90;
+    }
+    for (const eye of this.eyeMeshes){
+      eye.scale.y = lerp(eye.scale.y, eyeScaleY, clamp(dt * 24, 0, 1));
+    }
+
+    // 6. 生命感微动（小鼠标凝视 + 唱歌微昂 + 缺味点头 + 乐团节拍伴舞 + 慵懒东张西望）
+    const excited = (this.fizzTimer > 0) || (fireflyMode && fireflyState.active && !this.isGrabbed);
+    const isEnsembleSway = musicBox.playing && (this.curAiState === 'P5.5' || this.curAiState === 'P6');
+    const swayVal = isEnsembleSway ? Math.sin(beatPhase * TAU) : 0;
+
+    const wave = elapsed * (2.2 + wobble * 0.8 + (excited ? 2.2 : 0)) + this.phase;
+    const isMouseFresh = (performance.now() - mouse.activeAt) < 3500;
+    const lookX = isMouseFresh ? mouse.x * 0.28 : (Math.sin(wave * 0.5) * 0.12 + this.idleLookBias);
+    const lookY = isMouseFresh ? mouse.y * 0.16 : 0;
+
+    const headPullLift = this.isGrabbed ? clamp(this.pullBiasZ * 0.28, -0.22, 0.35) : 0;
+    const singTilt = this.singPulse * 0.24 - Math.sin(this.nodPulse * Math.PI) * 0.22;
+    this.headTiltY = lerp(this.headTiltY, lookX + this.tailBend * 0.35, clamp(dt * 6, 0, 1));
+    this.headTiltX = lerp(this.headTiltX, -lookY - headPullLift - singTilt, clamp(dt * 8, 0, 1));
+    const headRoll = Math.sin(wave) * 0.05 + swayVal * 0.13 + (this.rubHappyTimer > 0 ? Math.sin(elapsed * 14) * 0.10 : 0);
+    this.headGroup.rotation.set(this.headTiltX, this.headTiltY, headRoll);
+
+    // 外鳃绽放（唱歌 / 被撸 / 抓取 / 开心）
+    const flare = this.singPulse * 0.34 + (this.rubHappyTimer > 0 ? 0.26 : 0) + (this.isGrabbed ? 0.16 : 0)
+      + ((this.happyTimer > 0 || excited) ? Math.sin(elapsed * 18) * 0.16 : 0);
+    for (const g of this.gillGroups){
+      g.group.rotation.y = -g.side * (flare + Math.sin(wave * 1.3) * 0.06);
+      g.group.scale.setScalar(1 + this.singPulse * 0.14);
+    }
+
+    // 尾鳍摆动（追光 / 游动 / 乐团节拍伴舞）
+    const speedHoriz = Math.hypot(this.vel.x, this.vel.z);
+    const tailFreq = zeroGravity ? (5.2 + speedHoriz * 2.2) : (3.6 + speedHoriz * 3.4);
+    const tailAmp = 0.20 + Math.min(speedHoriz * 0.16, 0.34) + (isEnsembleSway ? 0.18 : 0);
+    const happyBoost = (this.happyTimer > 0 || this.fizzTimer > 0) ? Math.sin(elapsed * 16 + this.phase) * 0.22 : 0;
+    this.tailGroup.rotation.y = Math.sin(elapsed * tailFreq + this.phase) * tailAmp + this.tailBend + swayVal * 0.22 + happyBoost;
+    this.tailGroup.rotation.x = this.isGrabbed && this.pullBiasZ < 0 ? clamp(this.pullVec.y * 0.35, -0.35, 0.45) : 0;
+
+    // 四只小短腿划动（随地面踱步速度平滑提升，呈现小短腿慢踱步感）
+    const legSpeed = 5.5 + speedHoriz * 4.2;
+    const groundWalkBoost = (!zeroGravity && this.onFloor) ? clamp(speedHoriz * 0.24, 0, 0.22) : 0;
+    const paddle = ((this.onFloor && !zeroGravity) ? 0.05 : 0.28) + groundWalkBoost;
+    for (const l of this.legs){
+      l.mesh.rotation.x = Math.sin(elapsed * legSpeed + l.idx * 1.5) * paddle;
+    }
+
+    // 躯干内微光八面体糖芯自转
+    this.coreCandy.rotation.y += dt * 1.4;
+    this.coreCandy.rotation.x += dt * 0.9;
+
+    // 7. 瓷盘底焦散光斑（随高度衰减 + 唱歌提亮扩大）
+    const restY = this.floorRestY;
+    const heightAboveFloor = Math.max(0, this.pos.y - restY);
+    const heightFade = clamp(1 - heightAboveFloor / 4.8, 0.14, 1.0);
+    this.decal.position.set(this.pos.x, TRAY_FLOOR_Y + 0.015, this.pos.z);
+    this.decal.scale.setScalar((0.92 + heightAboveFloor * 0.12 + this.singPulse * 0.26) * sxz * this.sizeScale);
+    this.decalMat.opacity = clamp((0.34 * heightFade) + this.singPulse * 0.26, 0.08, 0.72);
+  }
+
+  dispose(){
+    scene.remove(this.root);
+    scene.remove(this.decal);
+    this.headMat.dispose();
+    this.torsoMat.dispose();
+    this.tailMat.dispose();
+    this.gillMat.dispose();
+    this.coreMat.dispose();
+    this.eyeMat.dispose();
+    this.specMat.dispose();
+    this.blushMat.dispose();
+    this.smileMat.dispose();
+    this.finMat.dispose();
+    this.decalMat.dispose();
+  }
+}
+
+/* =========================================================================
+   10. 五声果冻小乐团联动与魔法糖豆系统
+   ========================================================================= */
+const cardPulseTimers = [0, 0, 0, 0, 0];
+const ledPulseTimers = [0, 0, 0, 0, 0];
+
+function pulseFlavorCardUI(flavorIdx){
+  const card = document.querySelector(`.card[data-flavor-idx="${flavorIdx}"]`);
+  if (card){
+    card.classList.add('singing');
+    clearTimeout(cardPulseTimers[flavorIdx]);
+    cardPulseTimers[flavorIdx] = setTimeout(() => card.classList.remove('singing'), 320);
+  }
+  const led = document.querySelector(`.music-led[data-led-id="${flavorIdx}"]`);
+  if (led){
+    led.classList.add('lit');
+    clearTimeout(ledPulseTimers[flavorIdx]);
+    ledPulseTimers[flavorIdx] = setTimeout(() => led.classList.remove('lit'), 300);
+  }
+}
+
+function handleMusicBoxNote(noteIdx, accent){
+  pulseFlavorCardUI(noteIdx);
+  const targetFlavor = FLAVORS[noteIdx];
+  const matching = axolotls.filter(ax => ax.flavor.id === targetFlavor.id);
+
+  if (matching.length > 0){
+    matching.forEach((ax, i) => {
+      // 同口味多只时错峰 0 ~ 35ms 触发，呈现灵动合唱感
+      const staggerSec = i === 0 ? 0 : (0.012 + Math.random() * 0.023);
+      ax.scheduleSing(staggerSec, accent);
+    });
+  } else {
+    // 缺味兜底：香槟金瓷盘描边柔和微闪 + 全场空闲软糖轻点头
+    trayGoldPulse = 1.0;
+    for (const ax of axolotls){
+      if (ax.curAiState === 'P5.5' || ax.curAiState === 'P6'){
+        ax.nodPulse = 0.85;
+      }
+    }
+  }
+}
+
+const musicBox = new PentatonicMusicBox(sfx, handleMusicBoxNote);
+
+function disposeCandyObj(cd){
+  scene.remove(cd.group);
+  cd.materials.forEach(m => m.dispose());
+}
+
+function resolveCandyType(mode){
+  if (mode !== 'random') return mode;
+  const r = Math.random();
+  if (r < 0.25) return 'normal';
+  if (r < 0.50) return 'rainbow';
+  if (r < 0.75) return 'fizz';
+  return 'size';
+}
+
+function spawnLooseCandy(x, z, mode = selectedCandyMode, customY = null){
+  if (looseCandies.length >= MAX_LOOSE_CANDIES){
+    const old = looseCandies.shift();
+    disposeCandyObj(old);
+  }
+  const type = resolveCandyType(mode);
+  const posClamped = clampToTrayRoundedRect(x, z, 0.45);
+  const group = new THREE.Group();
+  const materials = [];
+
+  let color = FEED_CANDY_COLORS[(Math.random() * FEED_CANDY_COLORS.length) | 0];
+  if (type === 'rainbow') color = 0xff7aa2;
+  if (type === 'fizz') color = 0x56f0ff;
+  if (type === 'size') color = 0xffcb47;
+
+  const coreMat = new THREE.MeshPhysicalMaterial({
+    color,
+    emissive: new THREE.Color(color).multiplyScalar(type === 'normal' ? 0.30 : 0.45),
+    roughness: 0.12,
+    clearcoat: 1.0,
+    clearcoatRoughness: 0.05,
+  });
+  materials.push(coreMat);
+
+  const coreMesh = new THREE.Mesh(sharedGeos.looseCandy, coreMat);
+  coreMesh.castShadow = true;
+  group.add(coreMesh);
+
+  let haloMesh = null;
+  let haloMat = null;
+  if (type === 'rainbow' || type === 'fizz'){
+    haloMat = new THREE.MeshBasicMaterial({
+      color: type === 'fizz' ? 0x9cf7ff : 0xffffff,
+      transparent: true,
+      opacity: 0.72,
+    });
+    materials.push(haloMat);
+    haloMesh = new THREE.Mesh(sharedGeos.candyHalo, haloMat);
+    haloMesh.rotation.x = Math.PI * 0.35;
+    group.add(haloMesh);
+  } else if (type === 'size'){
+    haloMat = new THREE.MeshPhysicalMaterial({
+      color: 0x62e6b8,
+      emissive: new THREE.Color(0x62e6b8).multiplyScalar(0.32),
+      roughness: 0.18,
+      clearcoat: 1.0,
+    });
+    materials.push(haloMat);
+    haloMesh = new THREE.Mesh(sharedGeos.sizeRing, haloMat);
+    haloMesh.rotation.x = Math.PI * 0.5;
+    group.add(haloMesh);
+  }
+
+  const startY = (customY !== null)
+    ? clamp(customY, TRAY_FLOOR_Y + 0.55, ZERO_G_CEILING_Y - 0.65)
+    : (zeroGravity ? rand(1.9, 3.8) : 3.15);
+
+  group.position.set(posClamped.x, startY, posClamped.z);
+  scene.add(group);
+
+  if (customY !== null){
+    spawnJellyParticles(posClamped.x, startY, posClamped.z, color, 3, zeroGravity ? 0.15 : 0.65);
+  }
+
+  looseCandies.push({
+    type,
+    group,
+    coreMesh,
+    coreMat,
+    haloMesh,
+    haloMat,
+    materials,
+    color,
+    floatY: (customY !== null) ? startY : rand(1.65, 3.85),
+    pos: { x: posClamped.x, y: startY, z: posClamped.z },
+    vel: { x: rand(-0.45, 0.45), y: zeroGravity ? rand(-0.25, 0.25) : -1.2, z: rand(-0.45, 0.45) },
+    phase: Math.random() * TAU,
+  });
+
+  sfx.playPop(type === 'normal' ? 1.15 : 1.32);
+  return type;
+}
+
+function updateCandies(dt, elapsed){
+  for (const ax of axolotls) ax.chaseCandy = null;
+  const claimed = new Set();
+
+  for (let i = looseCandies.length - 1; i >= 0; i--){
+    const cd = looseCandies[i];
+
+    if (zeroGravity){
+      const targetY = cd.floatY + Math.sin(elapsed * 1.8 + cd.phase) * 0.24;
+      cd.vel.y += (targetY - cd.pos.y) * 2.8 * dt;
+      const damp = Math.pow(0.95, dt * 60);
+      cd.vel.x *= damp; cd.vel.y *= damp; cd.vel.z *= damp;
+      cd.pos.x += cd.vel.x * dt;
+      cd.pos.y = clamp(cd.pos.y + cd.vel.y * dt, TRAY_FLOOR_Y + 0.45, ZERO_G_CEILING_Y - 0.55);
+      cd.pos.z += cd.vel.z * dt;
+    } else {
+      cd.vel.y -= GRAVITY * 0.78 * dt;
+      cd.pos.x += cd.vel.x * dt;
+      cd.pos.y += cd.vel.y * dt;
+      cd.pos.z += cd.vel.z * dt;
+
+      const restY = TRAY_FLOOR_Y + 0.16;
+      if (cd.pos.y <= restY){
+        cd.pos.y = restY;
+        cd.vel.y = (-cd.vel.y > 1.2) ? (-cd.vel.y * 0.45) : 0;
+        cd.vel.x *= 0.88;
+        cd.vel.z *= 0.88;
+      }
+    }
+
+    const cl = clampToTrayRoundedRect(cd.pos.x, cd.pos.z, 0.35);
+    cd.pos.x = cl.x;
+    cd.pos.z = cl.z;
+
+    cd.group.position.set(cd.pos.x, cd.pos.y + Math.sin(elapsed * 5 + cd.phase) * 0.025, cd.pos.z);
+    cd.group.rotation.y += dt * 1.9;
+    if (cd.type === 'rainbow'){
+      const hue = (elapsed * 0.36 + cd.phase * 0.15) % 1.0;
+      cd.coreMat.color.setHSL(hue, 0.90, 0.68);
+      cd.coreMat.emissive.setHSL(hue, 0.85, 0.32);
+      cd.color = cd.coreMat.color.getHex();
+      if (cd.haloMesh){
+        cd.haloMesh.rotation.z += dt * 2.4;
+        cd.haloMat.color.setHSL((hue + 0.25) % 1.0, 0.92, 0.74);
+      }
+    } else if (cd.type === 'fizz'){
+      const pulse = 1.0 + Math.sin(elapsed * 14 + cd.phase) * 0.13;
+      cd.coreMesh.scale.setScalar(pulse);
+      if (cd.haloMesh) cd.haloMesh.rotation.z -= dt * 4.2;
+    } else if (cd.type === 'size' && cd.haloMesh){
+      cd.haloMesh.rotation.x += dt * 1.6;
+      cd.haloMesh.rotation.y += dt * 2.1;
+    }
+
+    // 按 AI 优先级分配给 P4/P5/P5.5/P6 的空闲软糖（跳过抓取中、跳跳狂欢中、被撸中）
+    let bestPet = null, bestDist = Infinity;
+    for (const ax of axolotls){
+      if (ax.isGrabbed || ax.fizzTimer > 0 || ax.rubHappyTimer > 0 || claimed.has(ax)) continue;
+      const d = Math.hypot(ax.pos.x - cd.pos.x, (ax.pos.y + 0.25 * ax.sizeScale) - cd.pos.y, ax.pos.z - cd.pos.z);
+      if (d < bestDist){
+        bestDist = d;
+        bestPet = ax;
+      }
+    }
+
+    if (bestPet){
+      const eatRadius = 0.96 * bestPet.sizeScale + 0.24;
+      if (bestDist < eatRadius){
+        bestPet.eatCandy(cd);
+        spawnJellyParticles(cd.pos.x, cd.pos.y + 0.18, cd.pos.z, cd.color, 7, zeroGravity ? 0.15 : 1.0);
+        disposeCandyObj(cd);
+        looseCandies.splice(i, 1);
+      } else {
+        bestPet.chaseCandy = cd;
+        claimed.add(bestPet);
+      }
+    }
+  }
+}
+
+/* =========================================================================
+   11. 多宠动态体型 3D/2D 柔弹性碰撞分离
+   ========================================================================= */
+function resolvePetCollisions(){
+  for (let i = 0; i < axolotls.length; i++){
+    const a = axolotls[i];
+    for (let j = i + 1; j < axolotls.length; j++){
+      const b = axolotls[j];
+      const minDist = (a.colRadius + b.colRadius) * 1.02;
+      const dx = b.pos.x - a.pos.x;
+      const dy = (b.pos.y - a.pos.y) * (zeroGravity ? 1.0 : 0.85);
+      const dz = b.pos.z - a.pos.z;
+      const d2 = dx * dx + dy * dy + dz * dz;
+      if (d2 >= minDist * minDist || d2 < 1e-6) continue;
+
+      const d = Math.sqrt(d2);
+      const overlap = (minDist - d) * 0.5;
+      const nx = dx / d, ny = dy / d, nz = dz / d;
+
+      const wa = a.isGrabbed ? 0.15 : (1 / Math.max(0.6, a.sizeScale));
+      const wb = b.isGrabbed ? 0.15 : (1 / Math.max(0.6, b.sizeScale));
+      const wSum = wa + wb || 1;
+      const fa = (overlap * 2 * wa) / wSum;
+      const fb = (overlap * 2 * wb) / wSum;
+
+      a.pos.x -= nx * fa;
+      a.pos.y = Math.max(a.floorRestY, a.pos.y - ny * fa * (zeroGravity ? 1.0 : 0.5));
+      a.pos.z -= nz * fa;
+
+      b.pos.x += nx * fb;
+      b.pos.y = Math.max(b.floorRestY, b.pos.y + ny * fb * (zeroGravity ? 1.0 : 0.5));
+      b.pos.z += nz * fb;
+
+      const relVn = (b.vel.x - a.vel.x) * nx + (b.vel.y - a.vel.y) * ny + (b.vel.z - a.vel.z) * nz;
+      if (relVn < 0){
+        const fizzBoost = (a.fizzTimer > 0 || b.fizzTimer > 0) ? 1.85 : 1.0;
+        const imp = -relVn * 0.44 * fizzBoost;
+        if (!a.isGrabbed){
+          a.vel.x -= nx * imp;
+          if (zeroGravity) a.vel.y -= ny * imp;
+          a.vel.z -= nz * imp;
+          a.squashVel -= Math.min(imp * 0.65, 4.5);
+        }
+        if (!b.isGrabbed){
+          b.vel.x += nx * imp;
+          if (zeroGravity) b.vel.y += ny * imp;
+          b.vel.z += nz * imp;
+          b.squashVel -= Math.min(imp * 0.65, 4.5);
+        }
+        if (imp > 2.6){
+          spawnJellyParticles(
+            (a.pos.x + b.pos.x) * 0.5,
+            (a.pos.y + b.pos.y) * 0.5 + 0.3,
+            (a.pos.z + b.pos.z) * 0.5,
+            a.flavor.color,
+            4,
+            zeroGravity ? 0.15 : 1.0
+          );
+        }
+      }
+    }
+  }
+}
+
+/* =========================================================================
+   12. 相机视口居中偏移 & 平滑轨道/缩放更新（失重态焦点上抬至 2.05）
+   ========================================================================= */
+function updateViewportLayout(){
+  if (!camera) return;
+  const W = window.innerWidth;
+  const H = window.innerHeight;
+  const paneEl = document.getElementById('pane');
+  const isDesktop = W > 780;
+
+  let paneOccupied = 0;
+  if (!panelCollapsed && paneEl){
+    const rect = paneEl.getBoundingClientRect();
+    if (rect.width > 0 && rect.left < W){
+      paneOccupied = Math.max(0, W - rect.left);
+    }
+  }
+
+  rightPanelSafeMarginPx = (!panelCollapsed && isDesktop) ? (paneOccupied + 26) : (isDesktop ? 42 : 24);
+
+  if (isDesktop && !panelCollapsed && paneOccupied > 60){
+    const offsetX = Math.round(paneOccupied * 0.46);
+    camera.setViewOffset(W, H, offsetX, 0, W, H);
+  } else {
+    camera.clearViewOffset();
+  }
+  camera.aspect = W / Math.max(H, 1);
+  camera.updateProjectionMatrix();
+}
+
+function setTargetZoom(val){
+  camState.targetZoom = clamp(val, camState.minZoom, camState.maxZoom);
+  const pct = Math.round((1 / camState.targetZoom) * 100);
+  const pctEl = document.getElementById('zoom-pct');
+  if (pctEl) pctEl.textContent = `${pct}%`;
+}
+
+function resetCameraView(silent = false){
+  camState.targetYaw = camState.defaultYaw;
+  camState.targetPitch = camState.defaultPitch;
+  setTargetZoom(camState.defaultZoom);
+  if (!silent){
+    sfx.playPop(1.08);
+    showToast('已恢复默认视角与缩放');
+  }
+}
+
+function updateCamera(dt){
+  const damp = 1 - Math.exp(-10.5 * dt);
+  camState.zoom = lerp(camState.zoom, camState.targetZoom, damp);
+  camState.yaw = lerp(camState.yaw, camState.targetYaw, damp);
+  camState.pitch = lerp(camState.pitch, camState.targetPitch, damp);
+
+  // 失重态平滑上抬焦点至 2.05，完整包揽盘底至高空 5.2 的 3D 追逐全景
+  const targetY = zeroGravity ? 2.05 : 0.52;
+  camState.target.y = lerp(camState.target.y, targetY, clamp(dt * 4.8, 0, 1));
+
+  const parallax = (grab || orbitDrag) ? 0 : 1;
+  const mx = clamp(mouse.x, -1, 1) * parallax;
+  const my = clamp(mouse.y, -1, 1) * parallax;
+
+  const effYaw = camState.yaw - mx * 0.04;
+  const effPitch = clamp(camState.pitch - my * 0.025, camState.minPitch - 0.04, camState.maxPitch + 0.04);
+  const dist = camState.baseDist * camState.zoom;
+
+  const horiz = dist * Math.cos(effPitch);
+  const cx = camState.target.x + Math.sin(effYaw) * horiz;
+  const cy = camState.target.y + Math.sin(effPitch) * dist;
+  const cz = camState.target.z + Math.cos(effYaw) * horiz;
+
+  camera.position.set(cx, cy, cz);
+  camera.lookAt(camState.target);
+}
+
+/* =========================================================================
+   13. 交互分发：抓软糖 / V3 轻抚撸宠 / 右键或空白处转视角 / 双击双模态投豆 / 缩放
+   ========================================================================= */
+function ndcFromClient(clientX, clientY){
+  return {
+    x: (clientX / Math.max(window.innerWidth, 1)) * 2 - 1,
+    y: -(clientY / Math.max(window.innerHeight, 1)) * 2 + 1,
+  };
+}
+
+function worldScaleAt(depth){
+  return 2 * Math.tan((camera.fov * Math.PI) / 360) * depth / Math.max(window.innerHeight, 1);
+}
+
+function isUIEventTarget(target){
+  return !!(target && target.closest && (
+    target.closest('#pane') ||
+    target.closest('#pane-toggle') ||
+    target.closest('#zoom-bar')
+  ));
+}
+
+function pickAxolotl(ndc){
+  _raycaster.setFromCamera(_ndcVec.set(ndc.x, ndc.y), camera);
+  const targets = [];
+  for (const ax of axolotls){
+    for (const m of ax.pickMeshes) targets.push(m);
+  }
+  const hits = _raycaster.intersectObjects(targets, false);
+  if (hits.length > 0){
+    const hit = hits[0];
+    const pet = hit.object.userData.pet;
+    if (pet){
+      return {
+        ax: pet,
+        partTag: hit.object.userData.partTag || 'body',
+        depth: clamp(hit.distance, 2.5, 34.0),
+        point: hit.point.clone(),
+      };
+    }
+  }
+
+  // 动态体型兜底包围球（中心在模型躯干中段 y + 0.42 * sizeScale）
+  const o = _raycaster.ray.origin;
+  const d = _raycaster.ray.direction;
+  let best = null, bestT = Infinity;
+  for (const ax of axolotls){
+    const cy = ax.pos.y + 0.42 * ax.sizeScale;
+    const ocx = o.x - ax.pos.x, ocy = o.y - cy, ocz = o.z - ax.pos.z;
+    const rad = 1.05 * ax.sizeScale;
+    const b = ocx * d.x + ocy * d.y + ocz * d.z;
+    const c = ocx * ocx + ocy * ocy + ocz * ocz - rad * rad;
+    const disc = b * b - c;
+    if (disc < 0) continue;
+    const t = -b - Math.sqrt(disc);
+    if (t > 0.5 && t < bestT){
+      bestT = t;
+      best = {
+        ax,
+        partTag: 'body',
+        depth: clamp(t, 2.5, 34.0),
+        point: new THREE.Vector3(o.x + d.x * t, o.y + d.y * t, o.z + d.z * t),
+      };
+    }
+  }
+  return best;
+}
+
+function computeClampedGrabTarget(clientX, clientY, depth, ax){
+  const W = window.innerWidth;
+  const H = window.innerHeight;
+  const safeX = clamp(clientX, 34, Math.max(120, W - rightPanelSafeMarginPx));
+  const safeY = clamp(clientY, 40, H - 30);
+
+  const ndc = ndcFromClient(safeX, safeY);
+  _raycaster.setFromCamera(_ndcVec.set(ndc.x, ndc.y), camera);
+  const o = _raycaster.ray.origin;
+  const d = _raycaster.ray.direction;
+
+  let tx = o.x + d.x * depth;
+  let ty = o.y + d.y * depth - 0.35;
+  let tz = o.z + d.z * depth;
+
+  const rad = ax ? ax.colRadius : BODY_RADIUS;
+  const minY = ax ? ax.floorRestY : TRAY_FLOOR_Y;
+  const maxY = zeroGravity ? (ZERO_G_CEILING_Y - 0.82 * (ax ? ax.sizeScale : 1.0)) : 7.8;
+
+  const cl = clampToTrayRoundedRect(tx, tz, rad);
+  tx = cl.x;
+  tz = cl.z;
+  ty = clamp(ty, minY, maxY);
+  return { x: tx, y: ty, z: tz };
+}
+
+function updateCursorModeClasses(){
+  const ring = document.getElementById('cursor-ring');
+  const dot = document.getElementById('cursor-dot');
+  ring.classList.toggle('grabbing', !!grab);
+  ring.classList.toggle('orbiting', !!(orbitDrag && orbitDrag.moved));
+  ring.classList.toggle('firefly', fireflyMode && !grab && !(orbitDrag && orbitDrag.moved));
+  dot.classList.toggle('orbiting', !!(orbitDrag && orbitDrag.moved));
+  dot.classList.toggle('firefly', fireflyMode && !grab && !(orbitDrag && orbitDrag.moved));
+}
+
+function onPointerDown(e){
+  if (isUIEventTarget(e.target)){
+    lastEmptyTap.t = 0;
+    return;
+  }
+
+  activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+  if (activePointers.size === 2){
+    lastEmptyTap.t = 0;
+    releaseGrab(false);
+    orbitDrag = null;
+    updateCursorModeClasses();
+    const pts = Array.from(activePointers.values());
+    const dist = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
+    pinchState = { startDist: Math.max(20, dist), startZoom: camState.targetZoom };
+    return;
+  }
+
+  mouse.px = e.clientX;
+  mouse.py = e.clientY;
+  const ndc = ndcFromClient(e.clientX, e.clientY);
+  mouse.x = ndc.x;
+  mouse.y = ndc.y;
+  mouse.activeAt = performance.now();
+
+  // 右键：旋转视角
+  if (e.button === 2){
+    lastEmptyTap.t = 0;
+    releaseGrab(false);
+    orbitDrag = {
+      pointerId: e.pointerId,
+      startX: e.clientX,
+      startY: e.clientY,
+      lastX: e.clientX,
+      lastY: e.clientY,
+      moved: true,
+      isLeftEmpty: false,
+    };
+    updateCursorModeClasses();
+    return;
+  }
+
+  if (e.button !== 0) return;
+
+  // 左键：优先检测软糖抓取（哪怕开着萤火逗宠也能随时抓起）
+  const picked = pickAxolotl(ndc);
+  if (picked){
+    lastEmptyTap.t = 0;
+    const ax = picked.ax;
+    grab = {
+      ax,
+      depth: picked.depth,
+      lastClientX: e.clientX,
+      lastClientY: e.clientY,
+      lastT: performance.now(),
+      vx: 0,
+      vy: 0,
+      vz: 0,
+      pressVel: 0,
+      pointerId: e.pointerId,
+    };
+    ax.isGrabbed = true;
+    ax.chaseCandy = null;
+    ax.rubEnergy = 0;
+    ax.pullBiasZ = picked.partTag === 'head' ? 1 : (picked.partTag === 'tail' ? -1 : 0);
+    ax.squashVel += 3.2;
+    lastRubAx = null;
+    updateCursorModeClasses();
+    sfx.playPop(1.05);
+    return;
+  }
+
+  // 左键点在空白处：设 6px 死区防抖，超 6px 才转视角，否则双击投糖豆
+  orbitDrag = {
+    pointerId: e.pointerId,
+    startX: e.clientX,
+    startY: e.clientY,
+    lastX: e.clientX,
+    lastY: e.clientY,
+    moved: false,
+    isLeftEmpty: true,
+  };
+  updateCursorModeClasses();
+}
+
+function onPointerMove(e){
+  if (activePointers.has(e.pointerId)){
+    activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  }
+
+  if (pinchState && activePointers.size === 2){
+    const pts = Array.from(activePointers.values());
+    const dist = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
+    const ratio = pinchState.startDist / Math.max(20, dist);
+    setTargetZoom(pinchState.startZoom * ratio);
+    return;
+  }
+
+  mouse.px = e.clientX;
+  mouse.py = e.clientY;
+  const ndc = ndcFromClient(e.clientX, e.clientY);
+  mouse.x = ndc.x;
+  mouse.y = ndc.y;
+  mouse.activeAt = performance.now();
+
+  pointerOverUI = !grab && !orbitDrag && isUIEventTarget(e.target);
+
+  if (orbitDrag && e.pointerId === orbitDrag.pointerId){
+    if (!orbitDrag.moved){
+      if (Math.hypot(e.clientX - orbitDrag.startX, e.clientY - orbitDrag.startY) <= 8){
+        return;
+      }
+      orbitDrag.moved = true;
+      orbitDrag.lastX = e.clientX;
+      orbitDrag.lastY = e.clientY;
+      updateCursorModeClasses();
+      return;
+    }
+    const dx = safeNum(e.clientX - orbitDrag.lastX, 0);
+    const dy = safeNum(e.clientY - orbitDrag.lastY, 0);
+    camState.targetYaw -= dx * 0.0068;
+    camState.targetPitch = clamp(camState.targetPitch + dy * 0.0056, camState.minPitch, camState.maxPitch);
+    orbitDrag.lastX = e.clientX;
+    orbitDrag.lastY = e.clientY;
+    return;
+  }
+
+  if (grab && e.pointerId === grab.pointerId){
+    const now = performance.now();
+    const dt = Math.max((now - grab.lastT) / 1000, 0.008);
+    const ws = worldScaleAt(grab.depth);
+
+    const dxPx = safeNum(e.clientX - grab.lastClientX, 0);
+    const dyPx = safeNum(e.clientY - grab.lastClientY, 0);
+
+    const rightX = Math.cos(camState.yaw);
+    const rightZ = -Math.sin(camState.yaw);
+    const screenSpdX = clamp((dxPx * ws) / dt, -28, 28);
+    const screenSpdY = clamp((-dyPx * ws) / dt, -24, 24);
+
+    grab.vx = safeNum(grab.vx * 0.65 + (screenSpdX * rightX) * 0.35, 0);
+    grab.vz = safeNum(grab.vz * 0.65 + (screenSpdX * rightZ) * 0.35, 0);
+    grab.vy = safeNum(grab.vy * 0.65 + screenSpdY * 0.35, 0);
+
+    const downSpeed = clamp((dyPx * ws) / dt, 0, 26);
+    grab.pressVel = Math.max(grab.pressVel * 0.82, downSpeed);
+    grab.ax.squishAmt = clamp(grab.pressVel * 0.24, 0, 2.8);
+
+    grab.lastClientX = e.clientX;
+    grab.lastClientY = e.clientY;
+    grab.lastT = now;
+    return;
+  }
+
+  // 非拖拽态：检测悬停与 V3「轻抚撸一撸」（与萤火逗宠严格互斥）
+  if (!pointerOverUI){
+    const picked = pickAxolotl(ndc);
+    hoverAx = picked ? picked.ax : null;
+
+    if (!fireflyMode && hoverAx && hoverAx.rubCooldown <= 0 && !hoverAx.isGrabbed){
+      if (lastRubAx === hoverAx){
+        const stepDist = Math.hypot(e.clientX - lastRubClientX, e.clientY - lastRubClientY);
+        if (stepDist > 1 && stepDist < 120){
+          hoverAx.rubEnergy += stepDist;
+          if (hoverAx.rubEnergy >= 180){
+            hoverAx.triggerRubHappy();
+          }
+        }
+      } else {
+        if (lastRubAx) lastRubAx.rubEnergy = 0;
+        lastRubAx = hoverAx;
+      }
+      lastRubClientX = e.clientX;
+      lastRubClientY = e.clientY;
+    } else {
+      if (lastRubAx) lastRubAx.rubEnergy = 0;
+      lastRubAx = null;
+    }
+  } else {
+    hoverAx = null;
+    if (lastRubAx) lastRubAx.rubEnergy = 0;
+    lastRubAx = null;
+  }
+}
+
+function releaseGrab(applyFling = true){
+  if (!grab) return;
+  const ax = grab.ax;
+
+  if (applyFling){
+    const flingScale = zeroGravity ? 0.42 : 0.72;
+    const flingX = clamp(safeNum(grab.vx, 0) * flingScale, -18, 18);
+    const flingZ = clamp(safeNum(grab.vz, 0) * flingScale, -18, 18);
+    const flingY = clamp(safeNum(grab.vy, 0) * (zeroGravity ? 0.38 : 0.68), -12, 16);
+    const pressBounce = zeroGravity ? 0 : clamp(safeNum(grab.pressVel, 0) * 0.26, 0, 5.5);
+
+    ax.vel.x = clamp(ax.vel.x * 0.35 + flingX, -20, 20);
+    ax.vel.z = clamp(ax.vel.z * 0.35 + flingZ, -20, 20);
+    ax.vel.y = clamp(Math.max(ax.vel.y * 0.35 + flingY, pressBounce), -12, 18);
+    if (zeroGravity){
+      ax.floatY = clamp(ax.pos.y, TRAY_FLOOR_Y + 0.35, ZERO_G_CEILING_Y - 0.95 * ax.sizeScale);
+    }
+
+    const stretchMag = ax.pullVec.length();
+    ax.squashVel += 4.2 + stretchMag * 5.0 + pressBounce * 1.1;
+    if (pressBounce > 2.0 || stretchMag > 0.45){
+      spawnJellyParticles(ax.pos.x, ax.pos.y + 0.3, ax.pos.z, ax.flavor.color, 5, zeroGravity ? 0.15 : 1.0);
+    }
+    sfx.playBoing(0.95 + stretchMag * 0.35, 0.13, ax.sizeScale);
+  }
+
+  ax.isGrabbed = false;
+  ax.squishAmt = 0;
+  ax.pullBiasZ = 0;
+  grab = null;
+  updateCursorModeClasses();
+}
+
+function handleDoubleClickDropCandy(clientX, clientY){
+  const ndc = ndcFromClient(clientX, clientY);
+  _raycaster.setFromCamera(_ndcVec.set(ndc.x, ndc.y), camera);
+
+  // 失重模式：直接对垂直相机视线、过太空舱中心 (0, 2.75, 0) 的 3D 平面求交，在任意立体位置悬浮投豆
+  if (zeroGravity){
+    camera.getWorldDirection(_camDir);
+    _planeFirefly3D.setFromNormalAndCoplanarPoint(_camDir, _zeroGCenter);
+    const airHit = _raycaster.ray.intersectPlane(_planeFirefly3D, _hitPt);
+    if (airHit){
+      const actualType = spawnLooseCandy(airHit.x, airHit.z, selectedCandyMode, airHit.y);
+      showCandySpawnToast(actualType);
+    }
+    return;
+  }
+
+  // 地面模式 1：命中盘面及盘沿周边（1.35 倍范围），收敛进盘并从上方 3.15 落下
+  const trayHit = _raycaster.ray.intersectPlane(_planeTray, _hitPt);
+  if (trayHit && Math.abs(trayHit.x) <= TRAY_HALF_X * 1.35 && Math.abs(trayHit.z) <= TRAY_HALF_Z * 1.35){
+    const actualType = spawnLooseCandy(trayHit.x, trayHit.z, selectedCandyMode, null);
+    showCandySpawnToast(actualType);
+    return;
+  }
+
+  // 地面模式 2：在瓷盘上方半空双击时，回退对垂直相机视线、过盘心上方 (0, 1.85, 0) 的 3D 平面求交，从半空坠入瓷盘
+  camera.getWorldDirection(_camDir);
+  _v1.set(0, 1.85, 0);
+  _planeFirefly3D.setFromNormalAndCoplanarPoint(_camDir, _v1);
+  const midAirHit = _raycaster.ray.intersectPlane(_planeFirefly3D, _hitPt);
+  if (midAirHit){
+    const dropY = clamp(midAirHit.y, 1.65, 4.6);
+    const actualType = spawnLooseCandy(midAirHit.x, midAirHit.z, selectedCandyMode, dropY);
+    showCandySpawnToast(actualType);
+  }
+}
+
+function onPointerUp(e){
+  activePointers.delete(e.pointerId);
+  if (activePointers.size < 2) pinchState = null;
+
+  if (orbitDrag && e.pointerId === orbitDrag.pointerId){
+    const wasEmptyTap = orbitDrag.isLeftEmpty && !orbitDrag.moved;
+    orbitDrag = null;
+    updateCursorModeClasses();
+
+    if (wasEmptyTap && !isUIEventTarget(e.target)){
+      const now = performance.now();
+      const dtTap = now - lastEmptyTap.t;
+      const distTap = Math.hypot(e.clientX - lastEmptyTap.x, e.clientY - lastEmptyTap.y);
+      if (dtTap < 380 && distTap < 38){
+        handleDoubleClickDropCandy(e.clientX, e.clientY);
+        lastEmptyTap.t = 0;
+      } else {
+        lastEmptyTap = { t: now, x: e.clientX, y: e.clientY };
+      }
+    }
+    return;
+  }
+
+  if (grab && e.pointerId === grab.pointerId){
+    releaseGrab(true);
+  }
+}
+
+function onPointerCancel(e){
+  activePointers.delete(e.pointerId);
+  if (activePointers.size < 2) pinchState = null;
+  lastEmptyTap.t = 0;
+  orbitDrag = null;
+  releaseGrab(false);
+  updateCursorModeClasses();
+}
+
+function onWheel(e){
+  if (isUIEventTarget(e.target)) return;
+  e.preventDefault();
+  const delta = clamp(e.deltaY, -160, 160);
+  const factor = Math.exp(delta * 0.0012);
+  setTargetZoom(camState.targetZoom * factor);
+}
+
+/* =========================================================================
+   14. 软糖管理、五声音乐盒 UI 联动与全盘交互绑定
+   ========================================================================= */
+const $ = id => document.getElementById(id);
+
+let toastTimer = null;
+function showToast(msg){
+  const el = $('toast');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2300);
+}
+
+function showCandySpawnToast(type){
+  if (type === 'rainbow') showToast('投喂了 🌈 彩虹变色糖，看谁先游过去变色！');
+  else if (type === 'fizz') showToast('投喂了 ⚡ 跳跳气泡糖，准备迎接狂欢！');
+  else if (type === 'size') showToast('投喂了 ⭐ 奇趣变身糖，会变大还是变小？');
+  else showToast('糖豆落盘啦！看谁先游过去吃掉 🍬');
+}
+
+function updateCountChip(){
+  $('ax-count').textContent = `托盘现有 ${axolotls.length} 只软糖`;
+  const btn = $('dump');
+  const full = axolotls.length >= MAX_AX;
+  btn.classList.toggle('is-full', full);
+  btn.innerHTML = full
+    ? '托盘已满（10 只）'
+    : '再倒出几只六角恐龙<span class="arr">↓</span>';
+}
+
+function updateMusicBarUI(){
+  const bar = $('music-bar');
+  const playBtn = $('btn-music-play');
+  const titleEl = $('music-title');
+  if (bar) bar.classList.toggle('playing', musicBox.playing);
+  if (playBtn){
+    playBtn.textContent = musicBox.playing ? '⏸' : '🎵';
+    playBtn.classList.toggle('play-active', musicBox.playing);
+  }
+  if (titleEl){
+    titleEl.textContent = musicBox.currentSong.title;
+  }
+}
+
+function spawnAxolotl(flavor, x, z, yaw, y, dropVel){
+  const cl = clampToTrayRoundedRect(x, z, BODY_RADIUS + 0.15);
+  const startY = zeroGravity ? rand(1.5, 3.8) : y;
+  const pet = new JellyAxolotlPet(flavor, cl.x, cl.z, yaw, startY, zeroGravity ? 0 : dropVel);
+  axolotls.push(pet);
+  updateCountChip();
+  return pet;
+}
+
+function resetDesktopPets(silent = false){
+  // 重置桌面时严格保留音乐盒播放状态、失重开关与萤火开关不中断
+  releaseGrab(false);
+  lastRubAx = null;
+  while (axolotls.length > 0){
+    axolotls.pop().dispose();
+  }
+  while (looseCandies.length > 0){
+    disposeCandyObj(looseCandies.pop());
+  }
+
+  const startXs = [-2.55, -1.28, 0.0, 1.28, 2.55];
+  const startZs = [0.55, -0.82, 0.22, -0.88, 0.48];
+  for (let i = 0; i < 5; i++){
+    const yaw = (i - 2) * -0.22 + rand(-0.18, 0.18);
+    spawnAxolotl(FLAVORS[i], startXs[i], startZs[i], yaw, 1.4 + i * 0.28, 0.4);
+  }
+  updateCountChip();
+  if (!silent){
+    sfx.playPop(1.12);
+    showToast('已整理好初始五味软糖（音乐盒与模式状态保持不变）🍬');
+  }
+}
+
+function setPanelCollapsed(collapsed){
+  panelCollapsed = collapsed;
+  $('pane').classList.toggle('collapsed', collapsed);
+  $('pane-toggle').classList.toggle('visible', collapsed);
+  updateViewportLayout();
+  if (collapsed){
+    showToast('已收起图鉴，解锁全屏手作瓷盘 ✨');
+  }
+}
+
+function toggleFireflyMode(){
+  fireflyMode = !fireflyMode;
+  const btn = $('btn-firefly');
+  btn.classList.toggle('active', fireflyMode);
+  btn.classList.toggle('firefly-on', fireflyMode);
+
+  if (fireflyMode){
+    axolotls.forEach(ax => { ax.rubEnergy = 0; });
+    lastRubAx = null;
+    sfx.playChime(659.25, 1.0, 0.10);
+    showToast(zeroGravity
+      ? '✨ 3D 失重追光已开启！移动鼠标上下左右控制光球，右键转视角抵达任意深度'
+      : '✨ 萤火逗宠已开启！晃动鼠标吸引大家围观');
+  } else {
+    sfx.playPop(0.95);
+    showToast('已收起萤火逗宠棒（轻抚软糖背部可触发撸宠）');
+  }
+  updateCursorModeClasses();
+}
+
+function toggleZeroGravity(){
+  zeroGravity = !zeroGravity;
+  const btn = $('btn-zerog');
+  btn.classList.toggle('active', zeroGravity);
+  btn.classList.toggle('zero-g-on', zeroGravity);
+
+  if (zeroGravity){
+    axolotls.forEach((ax, idx) => {
+      ax.floatY = rand(1.45, ZERO_G_CEILING_Y - 1.25 * ax.sizeScale);
+      ax.vel.y = rand(1.5, 2.9);
+      ax.vel.x += rand(-0.9, 0.9);
+      ax.vel.z += rand(-0.9, 0.9);
+      ax.yawVel = rand(-1.4, 1.4);
+      ax.onFloor = false;
+      setTimeout(() => sfx.playChime(ax.flavor.freq, ax.sizeScale, 0.075), idx * 55);
+    });
+    looseCandies.forEach(cd => {
+      cd.floatY = rand(1.55, 3.85);
+      cd.vel.y = rand(0.9, 1.8);
+    });
+    showToast(fireflyMode
+      ? '🫧 太空舱已开启！配合 ✨ 萤火可进行真 3D 全向追光'
+      : '🫧 已开启太空失重模式！软糖们飘起来啦');
+  } else {
+    axolotls.forEach(ax => {
+      ax.vel.y = Math.min(ax.vel.y, -1.2);
+    });
+    sfx.playPop(0.88);
+    showToast('重力恢复！全盘软糖 Q 弹砸回瓷盘 🍮');
+  }
+}
+
+function wireUI(){
+  // 1. 生成 V3 五果味卡片（绑定 data-flavor-idx 与琴键脉冲亮灯）
+  const cards = $('cards');
+  for (const f of FLAVORS){
+    const el = document.createElement('div');
+    el.className = 'card';
+    el.dataset.flavorIdx = String(f.idx);
+    el.style.setProperty('--fc', f.uiHex);
+    const cHex = f.color.toString(16).padStart(6, '0');
+    const dHex = f.deep.toString(16).padStart(6, '0');
+    el.innerHTML =
+      `<div class="swatch" style="background:radial-gradient(circle at 32% 30%, #fff 0%, transparent 46%), linear-gradient(135deg, #${cHex}, #${dHex})"></div>` +
+      `<div><div class="name">${f.name}</div><div class="note">${f.note}</div></div>` +
+      `<div class="tag">点它跳跳</div>`;
+    el.addEventListener('click', () => {
+      pulseFlavorCardUI(f.idx);
+      const matched = axolotls.filter(a => a.flavor.id === f.id);
+      if (matched.length > 0){
+        matched.forEach(a => a.triggerHop(1.0));
+        sfx.playChime(f.freq, matched[0].sizeScale, 0.13);
+        showToast(`${f.name}软糖开心得蹦起来啦 🍬`);
+      } else if (axolotls.length < MAX_AX){
+        const spawned = spawnAxolotl(f, rand(-2.0, 2.0), rand(-1.1, 1.1), rand(-0.5, 0.5), 4.6, 1.5);
+        if (spawned) spawned.triggerHop(0.85);
+        sfx.playChime(f.freq, 1.0, 0.12);
+        showToast(`新倒出一只「${f.name}」软糖 🍬`);
+      } else {
+        trayGoldPulse = 1.0;
+        sfx.playChime(f.freq, 1.0, 0.11);
+        showToast(`盘里目前没有${f.name}口味（可喂 🌈 变色糖试试）`);
+      }
+    });
+    cards.appendChild(el);
+  }
+
+  // 2. 生成五声音乐盒 5 枚迷你指示灯
+  const ledsWrap = $('music-leds');
+  for (const f of FLAVORS){
+    const led = document.createElement('span');
+    led.className = 'music-led';
+    led.dataset.ledId = String(f.idx);
+    led.style.setProperty('--lc', f.uiHex);
+    ledsWrap.appendChild(led);
+  }
+
+  // 3. 五声音乐盒播放 / 暂停 & 切歌按钮
+  $('btn-music-play').addEventListener('click', () => {
+    const isPlaying = musicBox.toggle();
+    updateMusicBarUI();
+    const song = musicBox.currentSong;
+    showToast(isPlaying ? `🎵 开始演奏 ${song.title}（${song.style}）` : '⏸ 已暂停五声果冻小乐团');
+  });
+
+  $('btn-music-next').addEventListener('click', () => {
+    sfx.init();
+    const song = musicBox.nextSong();
+    updateMusicBarUI();
+    showToast(`⏭ 切歌：${song.title} · ${song.style}`);
+  });
+
+  // 4. Q 弹晃动度滑块
+  const wSlider = $('wobble');
+  wSlider.addEventListener('input', () => {
+    wobble = (+wSlider.value) / 50;
+    $('wobble-val').textContent = wSlider.value;
+  });
+
+  // 5. 魔法糖豆单选胶囊
+  document.querySelectorAll('.candy-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      selectedCandyMode = pill.dataset.candy;
+      document.querySelectorAll('.candy-pill').forEach(b => b.classList.toggle('active', b === pill));
+      sfx.playPop(1.15);
+    });
+  });
+
+  // 6. 投喂按钮
+  $('btn-feed').addEventListener('click', () => {
+    const actualType = spawnLooseCandy(rand(-2.5, 2.5), rand(-1.5, 1.5), selectedCandyMode);
+    showCandySpawnToast(actualType);
+  });
+
+  // 7. 2×2 玩法按钮
+  $('btn-firefly').addEventListener('click', toggleFireflyMode);
+  $('btn-zerog').addEventListener('click', toggleZeroGravity);
+
+  $('btn-shake').addEventListener('click', () => {
+    if (zeroGravity){
+      axolotls.forEach((ax, idx) => {
+        const ang = Math.atan2(ax.pos.z, ax.pos.x) + Math.PI * 0.5;
+        ax.vel.x += Math.cos(ang) * 3.4 + rand(-0.9, 0.9);
+        ax.vel.z += Math.sin(ang) * 3.4 + rand(-0.9, 0.9);
+        ax.vel.y += rand(-1.4, 1.8);
+        ax.yawVel += rand(-3.5, 3.5);
+        ax.squashVel += rand(4.5, 7.0);
+        ax.happyTimer = 1.0;
+        setTimeout(() => sfx.playChime(ax.flavor.freq, ax.sizeScale, 0.08), idx * 55);
+      });
+      showToast('🫧 释放了一阵失重柔风漩涡！');
+    } else {
+      axolotls.forEach((ax, idx) => {
+        ax.vel.y = Math.max(ax.vel.y, rand(4.6, 7.2));
+        ax.vel.x += rand(-3.4, 3.4);
+        ax.vel.z += rand(-2.6, 2.6);
+        ax.squashVel += rand(6.0, 9.5);
+        ax.happyTimer = 1.0;
+        ax.onFloor = false;
+        setTimeout(() => sfx.playChime(ax.flavor.freq, ax.sizeScale, 0.085), idx * 50);
+      });
+      showToast('整盘软糖奏响五声音阶弹起来啦 🍮');
+    }
+  });
+
+  $('btn-reset').addEventListener('click', () => resetDesktopPets(false));
+
+  // 8. 再倒出几只
+  $('dump').addEventListener('click', () => {
+    if (axolotls.length >= MAX_AX){
+      const btn = $('dump');
+      btn.style.transform = 'translateX(-4px)';
+      setTimeout(() => (btn.style.transform = ''), 90);
+      showToast('瓷盘上已经放满 10 只软糖啦');
+      return;
+    }
+    const n = Math.min(3, MAX_AX - axolotls.length);
+    for (let i = 0; i < n; i++){
+      const flavor = FLAVORS[(Math.random() * FLAVORS.length) | 0];
+      spawnAxolotl(flavor, rand(-2.6, 2.6), rand(-1.5, 1.5), rand(-0.8, 0.8), rand(4.5, 6.8), 1.6);
+    }
+    sfx.playPop(1.2);
+  });
+
+  // 9. 左下角缩放与视角复位胶囊
+  $('btn-zoom-in').addEventListener('click', () => setTargetZoom(camState.targetZoom * 0.84));
+  $('btn-zoom-out').addEventListener('click', () => setTargetZoom(camState.targetZoom * 1.18));
+  $('btn-view-reset').addEventListener('click', () => resetCameraView(false));
+
+  // 10. 面板收起/展开 & 静音开关
+  $('btn-collapse').addEventListener('click', () => setPanelCollapsed(true));
+  $('pane-toggle').addEventListener('click', () => setPanelCollapsed(false));
+
+  const soundBtn = $('btn-sound');
+  soundBtn.addEventListener('click', () => {
+    sfx.setEnabled(!sfx.enabled);
+    soundBtn.textContent = sfx.enabled ? '🔊' : '🔇';
+    if (sfx.enabled) sfx.playChime(523.25, 1.0, 0.10);
+  });
+
+  setInterval(() => {
+    $('stretch').textContent = Math.round(clamp(stretchMeter, 0, 180));
+    $('bounce').textContent = clamp(bounceMeter, 0, 9.9).toFixed(1);
+  }, 110);
+
+  window.addEventListener('pointerdown', onPointerDown);
+  window.addEventListener('pointermove', onPointerMove);
+  window.addEventListener('pointerup', onPointerUp);
+  window.addEventListener('pointercancel', onPointerCancel);
+  window.addEventListener('wheel', onWheel, { passive: false });
+  window.addEventListener('contextmenu', e => {
+    if (!isUIEventTarget(e.target)) e.preventDefault();
+  });
+  window.addEventListener('blur', () => {
+    activePointers.clear();
+    pinchState = null;
+    lastEmptyTap.t = 0;
+    orbitDrag = null;
+    lastRubAx = null;
+    releaseGrab(false);
+    updateCursorModeClasses();
+  });
+  window.addEventListener('resize', () => {
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    updateViewportLayout();
+  });
+
+  if (window.innerWidth <= 780){
+    setPanelCollapsed(true);
+  }
+}
+
+/* =========================================================================
+   15. 自定义软糖光标平滑跟随
+   ========================================================================= */
+let curX = mouse.px, curY = mouse.py, curS = 1;
+function updateCursor(dt){
+  curX = lerp(curX, mouse.px, 1 - Math.pow(0.0001, dt));
+  curY = lerp(curY, mouse.py, 1 - Math.pow(0.0001, dt));
+  const ring = $('cursor-ring');
+  const dot = $('cursor-dot');
+
+  const hideCustom = pointerOverUI;
+  ring.classList.toggle('hidden', hideCustom);
+  dot.classList.toggle('hidden', hideCustom);
+
+  const isOrbiting = !!(orbitDrag && orbitDrag.moved);
+  const targetS = grab ? 1.82 : (isOrbiting ? 1.48 : (fireflyMode ? 1.25 : (hoverAx ? 1.32 : 1.0)));
+  curS = lerp(curS, targetS, 1 - Math.pow(0.01, dt));
+  ring.style.transform = `translate(${curX}px, ${curY}px) translate(-50%, -50%) scale(${curS.toFixed(3)})`;
+  dot.style.transform = `translate(${mouse.px}px, ${mouse.py}px) translate(-50%, -50%)`;
+}
+
+/* =========================================================================
+   16. 主循环与场景初始化
+   ========================================================================= */
+function tick(now){
+  requestAnimationFrame(tick);
+  let dt = (now - lastT) / 1000;
+  lastT = now;
+  if (!Number.isFinite(dt) || dt <= 0) dt = 1 / 60;
+  if (dt > 0.05) dt = 0.05;
+
+  time += dt;
+  acc += dt;
+
+  // 在主渲染帧 dt 推进五声音乐盒节拍，确保高刷/低刷屏节奏精准不抖动
+  musicBox.update(dt);
+  updateFirefly(dt, time);
+
+  let steps = 0;
+  while (acc >= H_STEP && steps < 3){
+    const gtarget = grab ? computeClampedGrabTarget(mouse.px, mouse.py, grab.depth, grab.ax) : null;
+    for (const ax of axolotls){
+      ax.stepPhysics(H_STEP, time, (grab && grab.ax === ax) ? gtarget : null);
+    }
+    resolvePetCollisions();
+    updateCandies(H_STEP, time);
+    acc -= H_STEP;
+    steps++;
+  }
+  if (steps === 3) acc = 0;
+
+  let maxStrain = 0;
+  let maxBounce = 0;
+  for (const ax of axolotls){
+    ax.stepRenderTimers(dt);
+    ax.updateVisuals(dt, time, musicBox.beatPhase);
+    if (ax.currentStrain > maxStrain) maxStrain = ax.currentStrain;
+    const speedMetric = Math.hypot(ax.vel.x, ax.vel.y, ax.vel.z) * 0.18 + Math.abs(ax.squashVel) * 0.22;
+    if (speedMetric > maxBounce) maxBounce = speedMetric;
+  }
+
+  updateParticles(dt);
+  updateHearts(dt, time);
+  updateNotes(dt);
+
+  // 缺味兜底：香槟金瓷盘描边暖金微闪衰减
+  if (trayGoldPulse > 0 && trayGoldMat){
+    trayGoldPulse = Math.max(0, trayGoldPulse - dt / 0.36);
+    trayGoldMat.emissiveIntensity = Math.sin(trayGoldPulse * Math.PI) * 0.78;
+  }
+
+  stretchMeter = lerp(stretchMeter, maxStrain * 100, 0.22);
+  bounceMeter = Math.max(bounceMeter * 0.93, maxBounce);
+
+  updateCamera(dt);
+  updateCursor(dt);
+  renderer.render(scene, camera);
+}
+
+function init(){
+  _raycaster = new THREE.Raycaster();
+  _ndcVec = new THREE.Vector2();
+  _v1 = new THREE.Vector3();
+  _upVec = new THREE.Vector3(0, 1, 0);
+  _qPull = new THREE.Quaternion();
+  _qInv = new THREE.Quaternion();
+  _planeTray = new THREE.Plane(new THREE.Vector3(0, 1, 0), -TRAY_FLOOR_Y);
+  _planeFirefly = new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.95);
+  _planeFirefly3D = new THREE.Plane();
+  _zeroGCenter = new THREE.Vector3(0, 2.75, 0);
+  _camDir = new THREE.Vector3();
+  _hitPt = new THREE.Vector3();
+  camState.target = new THREE.Vector3(0, 0.52, 0);
+
+  const canvas = document.getElementById('stage');
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.08;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.setClearColor(0xf1e8dd, 1);
+
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xf1e8dd);
+  scene.fog = new THREE.Fog(0xf1e8dd, 22, 48);
+
+  camera = new THREE.PerspectiveCamera(37, window.innerWidth / Math.max(window.innerHeight, 1), 0.1, 120);
+
+  // 柔和工作室环境光贴图（用完及时销毁临时几何与材质）
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  {
+    const envScene = new THREE.Scene();
+    envScene.background = new THREE.Color(0xfff7ee);
+    const disposables = [];
+    const addPanel = (color, w, h, x, y, z) => {
+      const geo = new THREE.PlaneGeometry(w, h);
+      const mat = new THREE.MeshBasicMaterial({ color });
+      const m = new THREE.Mesh(geo, mat);
+      m.position.set(x, y, z);
+      m.lookAt(0, 1.2, 0);
+      envScene.add(m);
+      disposables.push(geo, mat);
+    };
+    addPanel(0xffffff, 16, 12, 0, 14, 4);
+    addPanel(0xffe4cc, 12, 9, -14, 6, 4);
+    addPanel(0xdff2ff, 12, 9, 14, 6, -5);
+    scene.environment = pmrem.fromScene(envScene, 0.035).texture;
+    disposables.forEach(d => d.dispose());
+    pmrem.dispose();
+  }
+
+  const hemi = new THREE.HemisphereLight(0xfffcf7, 0xdccbb8, 0.92);
+  scene.add(hemi);
+
+  const keyLight = new THREE.DirectionalLight(0xfff6ea, 1.38);
+  keyLight.position.set(6.2, 13.2, 7.2);
+  keyLight.castShadow = true;
+  keyLight.shadow.mapSize.set(2048, 2048);
+  keyLight.shadow.camera.near = 2;
+  keyLight.shadow.camera.far = 30;
+  keyLight.shadow.camera.left = -8.5;
+  keyLight.shadow.camera.right = 8.5;
+  keyLight.shadow.camera.top = 8.5;
+  keyLight.shadow.camera.bottom = -8.5;
+  keyLight.shadow.bias = -0.0005;
+  keyLight.shadow.normalBias = 0.018;
+  keyLight.shadow.radius = 3.2;
+  scene.add(keyLight);
+
+  const rimLight = new THREE.DirectionalLight(0xd9efff, 0.62);
+  rimLight.position.set(-7.5, 6.5, -7.0);
+  scene.add(rimLight);
+
+  const fillLight = new THREE.DirectionalLight(0xfff0df, 0.36);
+  fillLight.position.set(2, 4, 10);
+  scene.add(fillLight);
+
+  buildAtelierStage();
+
+  glowTex = createSoftGlowTexture();
+  noteTex = createNoteTexture();
+  sharedGeos = buildSharedGeometries();
+
+  initParticlePool(52);
+  initHeartPool(20);
+  initNotePool(18);
+  initFirefly();
+
+  wireUI();
+  updateMusicBarUI();
+  updateViewportLayout();
+  resetDesktopPets(true);
+  updateCamera(1);
+  renderer.render(scene, camera);
+
+  lastT = performance.now();
+  window.__gummyBooted = true;
+  requestAnimationFrame(tick);
+}
+
+if (typeof document !== 'undefined' && document.getElementById('stage')){
+  (async () => {
+    try {
+      await loadThree(5500);
+      startAppOnce(THREE);
+    } catch (err){
+      console.error(err);
+      showOffline({ message: err && err.message ? err.message : 'Three.js 加载异常' });
+    }
+  })();
+}
+</script>
+</body>
+</html>
